@@ -15,8 +15,14 @@
     <script>
       (() => {
         const allowedSymbols = new Set(["OANDA:XAUUSD", "COMEX:GC1!", "FX:EURUSD"]);
-        const requested = decodeURIComponent(window.location.hash.slice(1));
-        const symbol = allowedSymbols.has(requested) ? requested : "OANDA:XAUUSD";
+        const allowedIntervals = new Set(["1", "5", "15", "30", "60", "240", "D"]);
+        const hash = window.location.hash.slice(1);
+        const parameters = new URLSearchParams(hash);
+        const legacySymbol = decodeURIComponent(hash);
+        const requestedSymbol = parameters.get("symbol") || legacySymbol;
+        const requestedInterval = parameters.get("interval") || "15";
+        const symbol = allowedSymbols.has(requestedSymbol) ? requestedSymbol : "OANDA:XAUUSD";
+        const interval = allowedIntervals.has(requestedInterval) ? requestedInterval : "15";
         const loading = document.querySelector("#chart-loading");
         const target = document.querySelector("#chart");
         const fail = () => {
@@ -32,7 +38,7 @@
           loading.hidden = true;
           target.hidden = false;
           new window.TradingView.widget({
-            container_id: "chart", autosize: true, symbol, interval: "15", timezone: "Etc/UTC",
+            container_id: "chart", autosize: true, symbol, interval, timezone: "Etc/UTC",
             theme: "dark", style: "1", locale: "ar", toolbar_bg: "#09131f", enable_publishing: false,
             hide_legend: false, allow_symbol_change: false, calendar: true, support_host: "https://www.tradingview.com"
           });

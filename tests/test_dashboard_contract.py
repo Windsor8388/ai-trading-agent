@@ -10,7 +10,7 @@ DASHBOARD = ROOT / "dashboard"
 class DashboardContractTests(unittest.TestCase):
     def test_control_room_makes_offline_and_no_trade_boundaries_visible(self) -> None:
         page = (DASHBOARD / "index.html").read_text(encoding="utf-8")
-        for required in ("V0.6", "ANALYSIS_ONLY", "NO TRADE", "NO ENGINE INPUT", "لا يوجد مزود أسعار حي", "لا تنفيذ حي"):
+        for required in ("V0.7", "ANALYSIS_ONLY", "NO TRADE", "NO ENGINE INPUT", "لا يوجد مزود أسعار حي", "لا تنفيذ حي", "RESEARCH OPERATIONS DESK", "SYSTEM RAILS"):
             self.assertIn(required, page)
         self.assertIn('src="about:blank"', page)
         self.assertIn('sandbox="allow-scripts allow-forms allow-popups"', page)
@@ -22,9 +22,12 @@ class DashboardContractTests(unittest.TestCase):
         self.assertIn('https://s3.tradingview.com/tv.js', chart)
         self.assertIn('new window.TradingView.widget', chart)
         self.assertIn("allowedSymbols", chart)
+        self.assertIn("allowedIntervals", chart)
+        self.assertIn("new URLSearchParams", chart)
         self.assertIn("chartFrame.src = chartUrl.toString()", app)
         self.assertIn("chartFrame.src = 'about:blank'", app)
-        self.assertIn("لا يُغذي محركات القرار", app)
+        self.assertIn("trading-intelligence-display-preferences-v1", app)
+        self.assertIn("لا تُغذي هذه البيانات محركات القرار", app)
 
     def test_vercel_headers_are_valid_and_limit_capabilities(self) -> None:
         config = json.loads((DASHBOARD / "vercel.json").read_text(encoding="utf-8"))

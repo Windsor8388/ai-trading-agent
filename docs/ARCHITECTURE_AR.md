@@ -1,6 +1,6 @@
 # التصميم المعماري لنظام Trading Intelligence
 
-**الإصدار:** 0.6.0 · **الوضع التشغيلي الحالي:** `ANALYSIS_ONLY` محلي وبدون أي data feed للنظام متصل. يوجد CSV importer وhistorical replay وPaper simulator وrisk/performance analytics وexecution lifecycle محلية، لكنها لا تتصل بسوق أو وسيط. توجد لوحة static مع رسم TradingView خارجي اختياري ومعزول؛ العرض ليس data feed ولا input للمحركات.
+**الإصدار:** 0.7.0 · **الوضع التشغيلي الحالي:** `ANALYSIS_ONLY` محلي وبدون أي data feed للنظام متصل. يوجد CSV importer وhistorical replay وPaper simulator وrisk/performance analytics وexecution lifecycle محلية، لكنها لا تتصل بسوق أو وسيط. توجد لوحة static مع رسم TradingView خارجي اختياري ومعزول؛ العرض ليس data feed ولا input للمحركات.
 التصميم يفصل عمداً البحث والتحليل والورق والتنفيذ. لا يجوز اختصار هذه المسارات لمجرد أن جميعها تستخدم كلمة "signal".
 
 ## 1) المعمارية المستهدفة
