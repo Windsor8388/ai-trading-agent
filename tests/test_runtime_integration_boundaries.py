@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 import unittest
 
-from trading_intelligence.agents import MarketResearchAgent
+from trading_intelligence.agents import ChartAnalysisAgent, MarketResearchAgent
 from trading_intelligence.central import CentralTradingIntelligenceEngine
 from trading_intelligence.engines.base import AnalysisEngine
 from trading_intelligence.integrations import (
@@ -112,6 +112,12 @@ class IntegrationBoundaryTests(unittest.TestCase):
         self.assertIsNotNone(result.levels)
         self.assertEqual(result.signal_result.signal.status, "PAPER_CANDIDATE")
         self.assertGreater(result.signal_result.signal.risk.reward_to_risk or 0, 1)
+        chart_result = ChartAnalysisAgent(agent).assess_chart(
+            snapshot(), ("H1",), signal_timeframe="H1", portfolio=PortfolioState(10_000),
+            instrument_spec=InstrumentRiskSpec("XAUUSD", 1, 1, 1), strategy_ids=("strategy.quant_trend_baseline",),
+        )
+        self.assertEqual(chart_result.assessment.signal_result.signal.status, "PAPER_CANDIDATE")
+        self.assertIsNone(chart_result.gemini_advisory)
 
 
 if __name__ == "__main__":

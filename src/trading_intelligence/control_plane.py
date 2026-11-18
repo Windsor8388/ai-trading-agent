@@ -22,6 +22,7 @@ from .integrations import (
     BingXRuntimeBinding,
     BingXVenueContract,
     GeminiIntegrationPolicy,
+    GeminiRole,
     IntegrationReadiness,
     LiveIntegrationGate,
     SecretReference,
@@ -45,16 +46,38 @@ class ControlPlaneConfiguration:
 
     bingx_binding: BingXRuntimeBinding | None = None
     gemini_policy: GeminiIntegrationPolicy = GeminiIntegrationPolicy()
+    gemini_model_id: str | None = None
+
+    def __post_init__(self) -> None:
+        if self.gemini_policy.role == GeminiRole.ADVISORY_ONLY and not self.gemini_model_id:
+            raise ValueError("An enabled Gemini advisory policy requires a configured model id.")
+        if self.gemini_policy.role == GeminiRole.DISABLED and self.gemini_model_id is not None:
+            raise ValueError("A disabled Gemini policy must not have a configured model id.")
 
     @classmethod
     def from_environment(cls, environ: Mapping[str, str] | None = None) -> "ControlPlaneConfiguration":
         source = os.environ if environ is None else environ
+        role_text = source.get("GEMINI_ROLE", GeminiRole.DISABLED.value)
+        try:
+            gemini_role = GeminiRole(role_text)
+        except ValueError as exc:
+            raise ValueError("GEMINI_ROLE must be DISABLED or ADVISORY_ONLY.") from exc
+        if gemini_role not in {GeminiRole.DISABLED, GeminiRole.ADVISORY_ONLY}:
+            raise ValueError("This platform supports Gemini DISABLED or ADVISORY_ONLY only.")
+        gemini_ref = source.get("GEMINI_API_KEY_REF")
+        gemini_model_id = source.get("GEMINI_MODEL_ID")
+        gemini_policy = GeminiIntegrationPolicy(
+            role=gemini_role,
+            credential_ref=SecretReference(gemini_ref) if gemini_ref else None,
+        )
+        if gemini_role == GeminiRole.ADVISORY_ONLY and not gemini_model_id:
+            raise ValueError("GEMINI_MODEL_ID is required when GEMINI_ROLE=ADVISORY_ONLY.")
         key_ref = source.get("BINGX_API_KEY_REF")
         secret_ref = source.get("BINGX_API_SECRET_REF")
         if bool(key_ref) != bool(secret_ref):
             raise ValueError("BINGX_API_KEY_REF and BINGX_API_SECRET_REF must be set together or both omitted.")
         if not key_ref:
-            return cls()
+            return cls(gemini_policy=gemini_policy, gemini_model_id=gemini_model_id)
         contract_document = source.get("BINGX_VENUE_CONTRACT_JSON")
         if not contract_document:
             raise ValueError("BINGX_VENUE_CONTRACT_JSON is required with BingX secret references.")
@@ -79,6 +102,8 @@ class ControlPlaneConfiguration:
                 venue_contract=BingXVenueContract(**contract_payload),
                 market_data_read_only_verified=verified,
             ),
+            gemini_policy=gemini_policy,
+            gemini_model_id=gemini_model_id,
         )
 
 

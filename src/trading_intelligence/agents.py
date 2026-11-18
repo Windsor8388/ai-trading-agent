@@ -10,6 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Iterable, Sequence
 
+from .advisors.gemini import GeminiAdvisory, GeminiChartAnalyst
 from .central import CentralTradingIntelligenceEngine
 from .data import validate_closed_candles
 from .engines.indicators import atr
@@ -85,6 +86,14 @@ class AgentAssessment:
     signal_result: SignalBuildResult
 
 
+@dataclass(frozen=True, slots=True)
+class ChartAnalysisAssessment:
+    """Deterministic assessment plus optional non-authoritative Gemini commentary."""
+
+    assessment: AgentAssessment
+    gemini_advisory: GeminiAdvisory | None
+
+
 class MarketResearchAgent:
     """Coordinate independent engines -> de-correlated decision -> risk-gated paper signal."""
 
@@ -129,3 +138,40 @@ class MarketResearchAgent:
             decision, snapshot, signal_timeframe, levels, portfolio, instrument_spec, strategy_ids,
         )
         return AgentAssessment(analysis, decision, levels, signal_result)
+
+
+class ChartAnalysisAgent:
+    """Compose deterministic chart research with optional Gemini commentary.
+
+    The optional adviser is called only *after* the research decision/risk gate is
+    complete.  Its output is attached for operator review and is never fed back into
+    engines, central scoring, risk sizing, signal conditions, or execution.
+    """
+
+    version = "0.1.0"
+
+    def __init__(self, research_agent: MarketResearchAgent, gemini_analyst: GeminiChartAnalyst | None = None) -> None:
+        self.research_agent = research_agent
+        self.gemini_analyst = gemini_analyst
+
+    def assess_chart(
+        self,
+        snapshot: MarketSnapshot,
+        timeframes: Iterable[str],
+        *,
+        signal_timeframe: str,
+        portfolio: PortfolioState,
+        instrument_spec: InstrumentRiskSpec | None,
+        strategy_ids: Sequence[str],
+        reference_levels: ProposedLevels | None = None,
+    ) -> ChartAnalysisAssessment:
+        assessment = self.research_agent.assess(
+            snapshot, timeframes, signal_timeframe=signal_timeframe, portfolio=portfolio,
+            instrument_spec=instrument_spec, strategy_ids=strategy_ids, reference_levels=reference_levels,
+        )
+        advisory = None
+        if self.gemini_analyst is not None:
+            advisory = self.gemini_analyst.analyze(
+                snapshot, signal_timeframe, assessment.decision, assessment.analysis.reports,
+            )
+        return ChartAnalysisAssessment(assessment, advisory)

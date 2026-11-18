@@ -8,7 +8,7 @@
 PYTHONPATH=src python -m unittest discover -s tests -v
 ```
 
-الحالات الحالية (63 اختباراً):
+الحالات الحالية (67 اختباراً):
 
 - رفض `future/unclosed` bar لمنع look-ahead.
 - رفض ICT evidence على بيانات غير صالحة.
@@ -46,6 +46,8 @@ PYTHONPATH=src python -m unittest discover -s tests -v
 - `InstrumentRegistry` يثبت فصل XAU/USD عن GC ويدرج FX والمؤشرات والأسهم والعملات الرقمية من دون اختراع vendor mapping أو مواصفات تنفيذ.
 - `MarketResearchAgent` ينسق مجموعتي evidence مستقلتين ومرجع ATR مغلقاً ثم يمر عبر risk gate إلى `PAPER_CANDIDATE` فقط؛ لا ينتج live order.
 - عقود BingX/Gemini تختبر أن السر مرجع secret-manager لا قيمة، وأن BingX يحتاج عقد API/Forward-Paper/reconciliation/emergency drills وموافقة زمنية؛ ومع ذلك يبقى `LIVE_BLOCKED` لأن لا sender حي في المستودع.
+- BingX USDT-M provider يختبر endpoint public/fallback GET وheader الرسمي وOHLCV/lineage، بينما VST `/order/test` يختبر canonical ASCII/HMAC وتبقى محاولة live dispatch مرفوضة صراحة.
+- `EnvironmentSecretResolver` لا يقبل إلا `sm://env/UPPERCASE_NAME` server-side، وGemini chart advisory يختبر completed-candle brief وprompt lineage من دون تسريب المفتاح ومن دون سلطة على decision/risk/execution.
 - control plane WSGI يختبر status أحادي origin ومخفي المراجع، مع `ANALYSIS_ONLY`/`UNAVAILABLE` و`no-store` وGET-only؛ ويعيد أي route للأوامر 404.
 
 هذه اختبارات سلوك برنامج وfixture اصطناعية، **وليست Backtest على السوق ولا إثبات ربحية**.

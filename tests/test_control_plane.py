@@ -61,6 +61,13 @@ class ControlPlaneTests(unittest.TestCase):
         self.assertEqual(public["bingx"]["state"], "FORWARD_PAPER_READY")
         self.assertNotIn("vault://", serialized)
         self.assertNotIn("official.example.test", serialized)
+        gemini_configuration = ControlPlaneConfiguration.from_environment({
+            "GEMINI_ROLE": "ADVISORY_ONLY",
+            "GEMINI_API_KEY_REF": "sm://env/GEMINI_API_KEY",
+            "GEMINI_MODEL_ID": "gemini-test-model",
+        })
+        gemini_status = RuntimeControlPlane(gemini_configuration).status(now=NOW).as_public_dict()
+        self.assertEqual(gemini_status["gemini"]["state"], "ADVISORY_READY")
         with self.assertRaises(ValueError):
             ControlPlaneConfiguration.from_environment({"BINGX_API_KEY_REF": "raw-key-value"})
         malformed_contract = {**CONTRACT, "cancel_supported": "true"}

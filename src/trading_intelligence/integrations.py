@@ -18,6 +18,7 @@ class IntegrationState(str, Enum):
     AWAITING_SECRET_BINDING = "AWAITING_SECRET_BINDING"
     AWAITING_VERIFIED_CONTRACT = "AWAITING_VERIFIED_CONTRACT"
     FORWARD_PAPER_READY = "FORWARD_PAPER_READY"
+    ADVISORY_READY = "ADVISORY_READY"
     LIVE_BLOCKED = "LIVE_BLOCKED"
     LIVE_GATE_READY = "LIVE_GATE_READY"
 
@@ -156,7 +157,7 @@ class LiveIntegrationGate:
         if policy.role == GeminiRole.DISABLED:
             return IntegrationReadiness("gemini", IntegrationState.DISABLED, (), "Gemini is disabled by platform policy.")
         return IntegrationReadiness(
-            "gemini", IntegrationState.AWAITING_SECRET_BINDING if policy.credential_ref is None else IntegrationState.FORWARD_PAPER_READY,
+            "gemini", IntegrationState.AWAITING_SECRET_BINDING if policy.credential_ref is None else IntegrationState.ADVISORY_READY,
             ("Gemini output must remain advisory and cannot change risk/decision/execution state.",),
             f"Gemini role={policy.role.value}; server-side secret reference required.",
         )
@@ -205,7 +206,7 @@ class LiveIntegrationGate:
             return IntegrationReadiness("bingx", IntegrationState.LIVE_BLOCKED, tuple(approval_blockers), "Live dispatch remains blocked despite a binding/approval record.")
         return IntegrationReadiness(
             "bingx", IntegrationState.LIVE_BLOCKED,
-            ("No BingX order-routing adapter is included in this repository; a separately reviewed implementation is still required.",),
+            ("No BingX production-live order-routing adapter is included in this repository; a separately reviewed implementation is still required.",),
             "Human/quality gates are documented, but live dispatch is blocked because this code has no order sender.",
         )
 

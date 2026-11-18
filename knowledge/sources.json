@@ -112,6 +112,26 @@
       "type": "practitioner_primary_material",
       "use": "ICT vocabulary provenance; no empirical validation claim",
       "source_version": "accessed-2026-11-18; publication/reference=accessed 2026-11-18"
+    },
+    {
+      "id": "SRC-BINGX-OPENAPI-SKILLS",
+      "title": "BingX OpenAPI Skills: Swap market, trade and authentication reference",
+      "publisher": "BingX-API",
+      "url": "https://github.com/BingX-API/api-ai-skills",
+      "published_or_accessed": "accessed 2026-11-18",
+      "type": "primary_api_documentation",
+      "use": "USDT-M public kline endpoint, VST/live base URLs, HMAC signing, test-order and reconciliation contract",
+      "source_version": "commit=5d96e72561c97de2ec3ba8650e48582c371cd4ad; accessed=2026-11-18"
+    },
+    {
+      "id": "SRC-GOOGLE-GENAI-PYTHON",
+      "title": "Google Gen AI Python SDK",
+      "publisher": "Google APIs",
+      "url": "https://github.com/googleapis/python-genai",
+      "published_or_accessed": "accessed 2026-11-18",
+      "type": "primary_sdk_documentation",
+      "use": "server-side Gemini Developer API SDK client and explicit model/API-version configuration",
+      "source_version": "commit=acf76e4a284273082e487af7ff77a3949d9ad797; accessed=2026-11-18"
     }
   ]
 }

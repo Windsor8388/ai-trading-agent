@@ -34,7 +34,7 @@ const intervalLabels = { 1: 'M1', 5: 'M5', 15: 'M15', 30: 'M30', 60: 'H1', 240: 
 
 const state = { symbol: 'OANDA:XAUUSD', interval: '15', chartLoaded: false, controlPlane: 'UNREACHABLE' };
 const controlPlanePath = '/api/v1/control-plane/status';
-const integrationStates = new Set(['DISABLED', 'AWAITING_SECRET_BINDING', 'AWAITING_VERIFIED_CONTRACT', 'FORWARD_PAPER_READY', 'LIVE_BLOCKED', 'LIVE_GATE_READY']);
+const integrationStates = new Set(['DISABLED', 'AWAITING_SECRET_BINDING', 'AWAITING_VERIFIED_CONTRACT', 'FORWARD_PAPER_READY', 'ADVISORY_READY', 'LIVE_BLOCKED', 'LIVE_GATE_READY']);
 
 function showToast(message) {
   toast.textContent = message;

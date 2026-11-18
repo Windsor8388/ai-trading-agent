@@ -1,6 +1,6 @@
 # طبقة بيانات السوق: المصادر، الواجهات، والهوية
 
-**الحالة الحالية:** لا يوجد مزود موصول ولا بيانات حقيقية/لحظية تم تنزيلها. كل اسم هنا مرشح تكاملي يتطلب مراجعة رخصته وتوفره الجغرافي/الحسابي وشروطه وحدود طلباته قبل الاعتماد عليه.
+**الحالة الحالية:** لا يوجد مزود مهيأ أو بيانات حقيقية/لحظية تم تنزيلها بواسطة هذا الفرع. يوجد code قابل للاستدعاء لـOANDA read-only وBingX USDT-M public OHLCV، لكن لا يبدأ اتصالاً من تلقاء نفسه ولا يثبت entitlement أو freshness إلى أن ينفذ backend استدعاءً حقيقياً ناجحاً. كل مصدر يتطلب مراجعة رخصته وتوفره الجغرافي/الحسابي وشروطه وحدود طلباته قبل الاعتماد عليه.
 
 ## 1) متطلبات غير قابلة للتفاوض
 
@@ -134,6 +134,7 @@ flowchart TD
 | الوظيفة | مصادر/واجهات مرشحة | الحد الأدنى الذي يجب أن يوفره المصدر | شرط قبل الاعتماد |
 |---|---|---|---|
 | XAU/USD historical/streaming | API وسيط منظم أو OANDA REST-v20 عند توفر الأداة للحساب | BID/ASK/MID معلن، complete bars، UTC، historical/live segment | اختبار reconciliation وحقوق الاستخدام؛ لا تعني الوثائق أن الرمز متاح للحساب |
+| BingX USDT-M perpetual OHLCV | `BingXSwapMarketDataProvider` الرسمي المراجع | `LAST` OHLCV باسم BTC-USDT ونحو ذلك؛ شمعة التكوين قد تصل | يربط canonical symbol صراحة، يسقط unclosed bars، يمر عبر lineage/pipeline؛ ليس بديلاً عن XAUUSD/GC أو L2 |
 | GC futures | CME-licensed feed أو مزود بيانات مرخّص/وسيط يقدم COMEX | عقد/expiry، trade volume، session، roll/OI metadata | entitlement/licence وcontract identity؛ لا series مستمر بلا roll policy |
 | L1/L2/trades | feed تداول مرخّص للـvenue | sequence، quote/trade timestamps، depth، recovery | مطلوب لـdelta/CVD/footprint؛ OHLC غير بديل |
 | calendar/macros | calendar مرخّص أو إصدارات الجهات الرسمية مثل FRED/BLS/BEA حيث يناسب | scheduled/published UTC، actual/consensus/prior/revisions/vintage | حفظ source وrevision؛ event embargo عند العطل |

@@ -1,4 +1,15 @@
-"""Execution lifecycle contracts. No live broker adapter is implemented or enabled."""
+"""Execution lifecycle contracts and guarded VST validation. No live adapter is enabled."""
+from .bingx_swap import (
+    BingXCredentials,
+    BingXLiveDispatchDisabled,
+    BingXSwapExecutionConfig,
+    BingXSwapOrder,
+    BingXSwapTestOrderClient,
+    BingXVenueOutcomeUnknown,
+    UrllibBingXSignedTransport,
+    canonical_parameter_string,
+    sign_bingx_parameters,
+)
 from .lifecycle import (
     ExecutionMode,
     ExecutionPolicy,
@@ -9,10 +20,11 @@ from .lifecycle import (
 )
 
 __all__ = [
-    "ExecutionMode",
+    "BingXCredentials", "BingXLiveDispatchDisabled", "BingXSwapExecutionConfig", "BingXSwapOrder",
+    "BingXSwapTestOrderClient", "BingXVenueOutcomeUnknown", "ExecutionMode",
     "ExecutionPolicy",
     "OrderLifecycleManager",
     "OrderRecord",
     "OrderStatus",
-    "VenueOrderSnapshot",
+    "UrllibBingXSignedTransport", "VenueOrderSnapshot", "canonical_parameter_string", "sign_bingx_parameters",
 ]

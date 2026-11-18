@@ -46,15 +46,15 @@ python -m json.tool dashboard/vercel.json
 
 ## مساحة التحكم المتكاملة
 
-إصدار الواجهة `V0.9` يضيف **Research Operations Desk** فوق أقسام المحركات:
+إصدار الواجهة `V0.10` يضيف **Research Operations Desk** فوق أقسام المحركات:
 
 - اختيار أداة وإطار للعرض (`XAU/USD` و`GC` منفصلان، مع EUR/USD وUS500 وAAPL وBTC/USD، وM1 إلى D1) مع Watchlist مخصصة للعرض فقط.
 - مزامنة اختيار العرض مع مساحة الرسم الخارجي، ولكن لا يبدأ تحميل طرف ثالث قبل الضغط الصريح على زر التحميل.
 - حفظ تفضيلات العرض فقط في `localStorage` تحت مفتاح محلي؛ لا تحفظ أسعاراً أو snapshots أو API keys أو حسابات.
 - زر `تحديث حالة control plane الآمنة` اختياري ويرسل `GET` نسبياً إلى `/api/v1/control-plane/status` من نفس origin فقط، ولا يرسل credentials/API keys ولا يتلقى أسعاراً أو إشارات أو أوامر. إذا لم يوجد backend (كما في Vercel static الحالي) يعرض failure صريحاً ولا يفترض اتصالاً.
 - زر نسخ ملخص حالة محلي يوضح `ANALYSIS_ONLY` و`NO_TRADE` وغياب feed/broker؛ لا ينشئ تقرير سوق أو أمر تداول.
-- System Rails تعرض بوضوح ما هو محلي جاهز وما هو غير موصول، بما في ذلك BingX venue gate وGemini المعطّل، بدلاً من استخدام مؤشرات نجاح زائفة.
-- لا يمكن تفعيل BingX أو إدخال secret من المتصفح؛ راجع [LIVE_INTEGRATION_GATES_AR.md](LIVE_INTEGRATION_GATES_AR.md) لعقد secret-manager/Forward-Paper/approval المطلوب.
+- System Rails تعرض بوضوح ما هو محلي جاهز وما هو غير موصول، بما في ذلك BingX OHLCV/VST gate وGemini الافتراضي المعطّل؛ يصبح Gemini advisory فقط بعد إعداد backend server-side.
+- لا يمكن تفعيل BingX أو Gemini أو إدخال secret من المتصفح؛ راجع [EXTERNAL_INTEGRATIONS_AR.md](EXTERNAL_INTEGRATIONS_AR.md) و[LIVE_INTEGRATION_GATES_AR.md](LIVE_INTEGRATION_GATES_AR.md) لعقد الأسرار/Forward-Paper/approval المطلوب.
 
 ## مسار التكامل المقترح
 

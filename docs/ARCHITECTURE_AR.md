@@ -1,6 +1,6 @@
 # التصميم المعماري لنظام Trading Intelligence
 
-**الإصدار:** 0.9.0 · **الوضع التشغيلي الحالي:** `ANALYSIS_ONLY` محلي وبدون أي data feed للنظام متصل. يوجد CSV importer وhistorical replay وPaper simulator وrisk/performance analytics وexecution lifecycle محلية، لكنها لا تتصل بسوق أو وسيط. توجد لوحة static مع رسم TradingView خارجي اختياري ومعزول؛ العرض ليس data feed ولا input للمحركات.
+**الإصدار:** 0.10.0 · **الوضع التشغيلي الحالي:** `ANALYSIS_ONLY` محلي وبدون أي data feed للنظام متصل. يوجد CSV importer وhistorical replay وPaper simulator وrisk/performance analytics وexecution lifecycle محلية، لكنها لا تتصل بسوق أو وسيط. توجد لوحة static مع رسم TradingView خارجي اختياري ومعزول؛ العرض ليس data feed ولا input للمحركات.
 التصميم يفصل عمداً البحث والتحليل والورق والتنفيذ. لا يجوز اختصار هذه المسارات لمجرد أن جميعها تستخدم كلمة "signal".
 
 ## 1) المعمارية المستهدفة
@@ -202,19 +202,23 @@ src/trading_intelligence/
   knowledge.py                  # source-validated deterministic concept retrieval
   knowledge_data/               # packaged mirror of the canonical registry
   orchestration.py              # independent multi-TF runner + explicit hash-ledger report recorder
-  agents.py                     # bounded engine/decision/reference-level/risk signal coordinator
-  integrations.py               # Gemini/BingX secret-reference and live-readiness contracts; no sender
-  control_plane.py               # GET-only redacted same-origin runtime status WSGI API; no market/account/order route
+  agents.py                     # deterministic chart-research coordinator + optional post-decision advisory attachment
+  integrations.py               # Gemini/BingX secret-reference and live-readiness contracts
+  control_plane.py              # GET-only redacted same-origin runtime status WSGI API; no market/account/order route
+  runtime/secrets.py            # server-only secret-reference resolver contracts; no serialization path
+  advisors/gemini.py            # optional Google SDK chart commentary; advisory only, no decision/risk/execution authority
   central.py                    # evidence de-correlation/NO_TRADE
   risk.py                       # independent limits, gap-buffered sizing, embargo gates
   risk_book.py                  # local realized-loss/DD/exposure/correlation state
   monitoring.py                 # freshness/incident health model; no alert transport
   signals.py                    # analysis/paper safety gate
   paper.py                      # local idempotent paper state machine; no broker
-  execution/lifecycle.py         # policy-gated, disconnected lifecycle + reconciliation state machine
+  execution/lifecycle.py        # policy-gated, disconnected lifecycle + reconciliation state machine
+  execution/bingx_swap.py       # HMAC signed VST `/order/test` validation only; live dispatch explicitly refused
   events.py                      # supplied-calendar embargo gate; no news fetcher
   providers/contracts.py        # read-only market/calendar API contracts
   providers/oanda_v20.py        # explicit injected read-only OANDA candle adapter
+  providers/bingx_swap.py       # official public USDT-M kline adapter; completed bars + lineage only
   providers/pipeline.py         # quality/lineage/replay/revision/freshness receipts + snapshots + explicit polling
   providers/instruments.py      # canonical metals/FX/index/equity/crypto/future identity registry
   providers/csv_ohlcv.py        # strict user-supplied historical OHLCV importer
@@ -228,7 +232,7 @@ src/trading_intelligence/
   research/metrics.py           # metrics, bootstrap, temporal folds
   research/analytics.py         # DD/PF/expectancy and strategy/timeframe/session attribution
   research/ledger.py            # append-only SHA-256 experiment/prediction trail
-tests/                          # 63 local deterministic tests (current)
+tests/                          # 67 local deterministic tests (current)
 docs/
   TRADING_INTELLIGENCE_RESEARCH_AR.md
   DATA_SOURCES_AR.md
@@ -240,7 +244,9 @@ docs/
   ENGINE_CATALOG_AR.md
   INSTRUMENT_UNIVERSE_AR.md
   LIVE_INTEGRATION_GATES_AR.md
+  EXTERNAL_INTEGRATIONS_AR.md
 
+config/runtime.env.example      # server-only secret-reference/config template; no credential values
 dashboard/                      # static RTL control room; opt-in sandboxed third-party chart only
 ```
 
@@ -253,17 +259,17 @@ dashboard/                      # static RTL control room; opt-in sandboxed thir
 | 1. المعرفة والبحث | registry + concepts + policy | مراجعة مصدر/إصدار لكل rule، وفصل definition عن evidence |
 | 2. محركات المدارس | detectors مستقلة وfixtures | unit/replay tests وconcept mapping لكل output |
 | 3. العقل المركزي | calibration/de-correlation/regime | ablation وcorrelation analysis على OOS فقط |
-| 4. البيانات | CSV historical importer + hash manifest + resampling محافظ **(منفذ محلياً)**؛ provider API read-only لاحقاً | QA، timestamps، gaps، spot/GC identity، reconciliation مع vendor |
+| 4. البيانات | CSV/history + OANDA injected adapter وBingX USDT-M public OHLCV adapter **(منفذ لكن غير مهيأ)** | QA، timestamps، gaps، complete-bar drop، spot/GC identity، real response/reconciliation مع vendor |
 | 5. signals | levels/expiry/cancel conditions | لا signal عند stale/unverified/missing inputs |
 | 6. risk | portfolio/exposure/news correlation **(limits وevent/circuit breakers منفذة؛ لا calendar feed بعد)** | property tests وlimits في حالات فشل متعددة |
 | 7. backtest | event-driven next-open fills/cost/stop-first replay **(منفذ محلياً)**؛ roll/tick model لاحقاً | benchmark known fixtures + no-lookahead audits |
 | 8. paper | append-only hash ledger + in-memory idempotent paper simulator **(منفذ محلياً)** | reconciliation وفترة forward precommitted |
 | 9. improvement | locked experiment registry + model gates | final OOS untouched + drift monitoring |
-| 10. live study | venue adapter + human approval؛ يوجد الآن lifecycle محلي يمنع live ويغطي validation/idempotency/reject/disconnect/reconcile/kill state | disaster drills, security review، explicit user approval، venue reconciliation؛ لا auto-go-live |
+| 10. live study | BingX public OHLCV + server-side HMAC VST `/order/test` موجودان؛ lifecycle يمنع live dispatch ويغطي validation/idempotency/reject/disconnect/reconcile/kill state | disaster drills, security review، persistent RBAC approval، venue reconciliation؛ لا auto-go-live |
 
 ## 8) التنفيذ الحقيقي: تصميم مؤجل ومقيد
 
-قبل أي دراسة live، يطلب النظام: حساب مخصص، صلاحيات أقل ما يمكن، idempotency key، order validation، max notional، kill switch، reconciliation عند إعادة الاتصال، event log غير قابل للمحو، وموافقة بشرية لكل تفعيل. ليس في المشروع كود يتصل بوسيط أو يستخدم credentials، وبناءً على طلب المستخدم لا يجب إضافته أو تشغيله من دون موافقة صريحة لاحقة.
+قبل أي دراسة live، يطلب النظام: حساب مخصص، صلاحيات أقل ما يمكن، idempotency key، order validation، max notional، kill switch، reconciliation عند إعادة الاتصال، event log غير قابل للمحو، وموافقة بشرية لكل تفعيل. يوجد الآن BingX public-data adapter وVST signed **test-order** client يستدعيان runtime server-side فقط عند binding صريح؛ لا يوجد live place-order path ولا credentials مهيأة أو اتصال نشط في هذا الفرع.
 
 ## 9) المسارات التشغيلية التفصيلية: البيانات، المخاطر، الاختبار، والمراقبة
 
