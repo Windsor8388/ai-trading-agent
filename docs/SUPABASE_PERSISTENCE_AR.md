@@ -1,4 +1,4 @@
-# التخزين الدائم في Supabase — عقد Paper Lifecycle V0.11
+# التخزين الدائم في Supabase — عقد Paper Lifecycle V0.12
 
 ## النطاق المنفذ وحدوده
 

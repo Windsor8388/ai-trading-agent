@@ -8,6 +8,7 @@ from datetime import datetime, timedelta, timezone
 from .central import CentralTradingIntelligenceEngine
 from .engines import ICTAnalysisEngine, PriceActionEngine, QuantitativeAnalysisEngine, SMCAnalysisEngine, VolumeAnalysisEngine
 from .models import Candle, DataMode, FeedMetadata, MarketSnapshot
+from .operations import PlatformDoctor
 from .orchestration import AnalysisOrchestrator
 
 
@@ -26,12 +27,18 @@ def _demo_snapshot() -> MarketSnapshot:
     return MarketSnapshot(as_of, feed, {"H1": tuple(candles)})
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description="Run an offline, non-tradable analysis demo.")
-    parser.add_argument("--demo", action="store_true", help="Run deterministic synthetic OHLCV example")
-    args = parser.parse_args()
-    if not args.demo:
-        parser.error("Only --demo is currently supported; no live-data connector is configured.")
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description="Offline demo and maintenance diagnostics; no broker or market connection.")
+    command = parser.add_mutually_exclusive_group(required=True)
+    command.add_argument("--demo", action="store_true", help="Run deterministic synthetic OHLCV example")
+    command.add_argument("--doctor", action="store_true", help="Run offline repository/configuration maintenance diagnostics")
+    parser.add_argument("--ledger", help="Optional local JSONL ResearchLedger path for --doctor hash-chain verification")
+    parser.add_argument("--strict", action="store_true", help="For --doctor, return non-zero when warnings or failures are present")
+    args = parser.parse_args(argv)
+    if args.doctor:
+        report = PlatformDoctor().inspect(ledger_path=args.ledger)
+        print(json.dumps(report.as_dict(), indent=2, sort_keys=True, ensure_ascii=False))
+        return 1 if report.has_failures or (args.strict and report.has_warnings) else 0
     snapshot = _demo_snapshot()
     runner = AnalysisOrchestrator((PriceActionEngine(), ICTAnalysisEngine(), SMCAnalysisEngine(), VolumeAnalysisEngine(), QuantitativeAnalysisEngine()))
     run = runner.run(snapshot, ("H1",))
@@ -43,7 +50,8 @@ def main() -> None:
         "safety": "Synthetic offline data only; this output is not a market signal or an order.",
     }
     print(json.dumps(payload, indent=2, default=str))
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

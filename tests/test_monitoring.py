@@ -22,6 +22,19 @@ class MonitoringTests(unittest.TestCase):
         monitor.resolve_incident("data-gap-1", NOW + timedelta(seconds=32))
         self.assertEqual(monitor.snapshot(NOW + timedelta(seconds=32), stale_after=timedelta(seconds=30)).overall, HealthStatus.HEALTHY)
 
+    def test_expected_or_future_dated_feed_is_critical_instead_of_silently_healthy(self) -> None:
+        expected = FeedKey("reviewed-provider", "XAUUSD", "H1")
+        monitor = OperationalMonitor(expected_feeds=(expected,))
+        missing = monitor.snapshot(NOW, stale_after=timedelta(seconds=30))
+        self.assertEqual(missing.overall, HealthStatus.CRITICAL)
+        self.assertIsNone(missing.feeds[0].last_heartbeat_at)
+        self.assertIsNone(missing.feeds[0].age_seconds)
+
+        monitor.record_heartbeat(expected, NOW + timedelta(seconds=1))
+        clock_skew = monitor.snapshot(NOW, stale_after=timedelta(seconds=30))
+        self.assertEqual(clock_skew.overall, HealthStatus.CRITICAL)
+        self.assertLess(clock_skew.feeds[0].age_seconds or 0, 0)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,6 +1,6 @@
 # التصميم المعماري لنظام Trading Intelligence
 
-**الإصدار:** 0.11.0 · **الوضع التشغيلي الحالي:** `ANALYSIS_ONLY` محلي وبدون أي data feed للنظام متصل. يوجد CSV importer وhistorical replay وPaper simulator وrisk/performance analytics وexecution lifecycle محلية، لكنها لا تتصل بسوق أو وسيط. توجد لوحة static مع رسم TradingView خارجي اختياري ومعزول؛ العرض ليس data feed ولا input للمحركات. أضيف في V0.11 migration وadapter اختياريان لسجل Paper lifecycle ذري في Supabase، لكن لا يوجد backend منشور أو secret binding أو اتصال سوق مفعل؛ راجع [`SUPABASE_PERSISTENCE_AR.md`](SUPABASE_PERSISTENCE_AR.md).
+**الإصدار:** 0.12.0 · **الوضع التشغيلي الحالي:** `ANALYSIS_ONLY` محلي وبدون أي data feed للنظام متصل. يوجد CSV importer وhistorical replay وPaper simulator وrisk/performance analytics وexecution lifecycle محلية، لكنها لا تتصل بسوق أو وسيط. توجد لوحة static مع رسم TradingView خارجي اختياري ومعزول؛ العرض ليس data feed ولا input للمحركات. أضيف في V0.11 migration وadapter اختياريان لسجل Paper lifecycle ذري في Supabase، لكن لا يوجد backend منشور أو secret binding أو اتصال سوق مفعل؛ راجع [`SUPABASE_PERSISTENCE_AR.md`](SUPABASE_PERSISTENCE_AR.md). تضيف V0.12 doctor محلياً وrunbook drills وتحذيرات expected-feed/clock-skew؛ لا تمثل هذه مراقبة خارجية أو اتصالاً حياً؛ راجع [`OPERATIONS_AND_DRILLS_AR.md`](OPERATIONS_AND_DRILLS_AR.md).
 التصميم يفصل عمداً البحث والتحليل والورق والتنفيذ. لا يجوز اختصار هذه المسارات لمجرد أن جميعها تستخدم كلمة "signal".
 
 ## 1) المعمارية المستهدفة
@@ -210,7 +210,8 @@ src/trading_intelligence/
   central.py                    # evidence de-correlation/NO_TRADE
   risk.py                       # independent limits, gap-buffered sizing, embargo gates
   risk_book.py                  # local realized-loss/DD/exposure/correlation state
-  monitoring.py                 # freshness/incident health model; no alert transport
+  monitoring.py                 # freshness/incident health model; expected-feed/clock-skew guards; no alert transport
+  operations.py                 # offline PlatformDoctor maintenance diagnostics; no secret resolution/network
   signals.py                    # analysis/paper safety gate
   paper.py                      # local idempotent paper state machine; no broker
   execution/lifecycle.py        # policy-gated, disconnected lifecycle + reconciliation state machine
@@ -232,7 +233,7 @@ src/trading_intelligence/
   research/metrics.py           # metrics, bootstrap, temporal folds
   research/analytics.py         # DD/PF/expectancy and strategy/timeframe/session attribution
   research/ledger.py            # append-only SHA-256 experiment/prediction trail
-tests/                          # 67 local deterministic tests (current)
+tests/                          # 77 local deterministic tests (current)
 docs/
   TRADING_INTELLIGENCE_RESEARCH_AR.md
   DATA_SOURCES_AR.md
@@ -245,6 +246,7 @@ docs/
   INSTRUMENT_UNIVERSE_AR.md
   LIVE_INTEGRATION_GATES_AR.md
   EXTERNAL_INTEGRATIONS_AR.md
+  OPERATIONS_AND_DRILLS_AR.md
 
 config/runtime.env.example      # server-only secret-reference/config template; no credential values
 dashboard/                      # static RTL control room; opt-in sandboxed third-party chart only

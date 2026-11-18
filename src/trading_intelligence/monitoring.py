@@ -26,8 +26,8 @@ class FeedKey:
 @dataclass(frozen=True, slots=True)
 class FeedHealth:
     key: FeedKey
-    last_heartbeat_at: datetime
-    age_seconds: float
+    last_heartbeat_at: datetime | None
+    age_seconds: float | None
     status: HealthStatus
 
 
@@ -50,11 +50,23 @@ class MonitoringSnapshot:
 
 
 class OperationalMonitor:
-    """In-memory monitor suitable for tests and a local PoC; persist events in production."""
+    """In-memory monitor suitable for tests and a local PoC; persist events in production.
 
-    version = "0.1.0"
+    `expected_feeds` makes absence explicit. Without an allowlisted expected feed, an
+    empty monitor represents an analysis-only process and remains HEALTHY; with one,
+    a missing heartbeat is CRITICAL rather than a misleading green status. A heartbeat
+    timestamp later than the snapshot is treated as clock-skew/lineage failure, never
+    as a fresh feed.
+    """
 
-    def __init__(self) -> None:
+    version = "0.2.0"
+
+    def __init__(self, *, expected_feeds: tuple[FeedKey, ...] = ()) -> None:
+        if len(set(expected_feeds)) != len(expected_feeds):
+            raise ValueError("Expected feeds must be unique.")
+        if any(not item.provider or not item.instrument or not item.timeframe for item in expected_feeds):
+            raise ValueError("Expected feed key fields must be non-empty.")
+        self._expected_feeds = frozenset(expected_feeds)
         self._heartbeats: dict[FeedKey, datetime] = {}
         self._incidents: dict[str, OperationalIncident] = {}
 
@@ -97,9 +109,15 @@ class OperationalMonitor:
         if stale_after.total_seconds() <= 0:
             raise ValueError("stale_after must be positive.")
         feeds = []
-        for key, heartbeat in self._heartbeats.items():
+        for key in self._expected_feeds | self._heartbeats.keys():
+            heartbeat = self._heartbeats.get(key)
+            if heartbeat is None:
+                feeds.append(FeedHealth(key, None, None, HealthStatus.CRITICAL))
+                continue
             age = (as_of - heartbeat).total_seconds()
-            status = HealthStatus.HEALTHY if age <= stale_after.total_seconds() else HealthStatus.CRITICAL
+            # Negative age is not "fresh": it is a clock/lineage anomaly that can
+            # otherwise create look-ahead risk and hide a broken time source.
+            status = HealthStatus.HEALTHY if 0 <= age <= stale_after.total_seconds() else HealthStatus.CRITICAL
             feeds.append(FeedHealth(key, heartbeat, age, status))
         open_incidents = tuple(sorted((item for item in self._incidents.values() if item.resolved_at is None), key=lambda item: item.opened_at))
         critical = any(item.status == HealthStatus.CRITICAL for item in feeds) or any(item.severity == HealthStatus.CRITICAL for item in open_incidents)

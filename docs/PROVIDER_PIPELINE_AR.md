@@ -11,7 +11,7 @@ providers/contracts.py  → العقد المجرد للمصدر/الطلب/ال
 providers/oanda_v20.py  → تحويل candles OANDA v20 عند حقن transport + token read-only
 providers/pipeline.py   → quality gate، lineage receipt، replay/revision/freshness classification، polling plan، snapshot builder
 providers/instruments.py → canonical asset registry منفصل عن vendor symbol ومواصفات التنفيذ
-monitoring.py            → heartbeat/incident state محلي منفصل
+monitoring.py            → heartbeat/incident state محلي منفصل، مع expected-feed وclock-skew guards
 ```
 
 ### OANDA v20 adapter
@@ -59,6 +59,6 @@ monitoring.py            → heartbeat/incident state محلي منفصل
 3. fixture من response حقيقي **منقح** يتضمن incomplete/gap/duplicate/schema error ومقارنة counts مع vendor.
 4. سياسة session/holiday/DST وbar-close watermark لكل instrument/timeframe.
 5. persistent raw storage وimmutable lineage/audit؛ الذاكرة المحلية الحالية ليست storage إنتاجي.
-6. `OperationalMonitor` heartbeat وincident integration؛ stale feed يجب أن يبقي Trade Signal في `NO_TRADE`.
+6. `OperationalMonitor` heartbeat وincident integration مع `expected_feeds` صريحة؛ missing/stale/future-dated heartbeat يجب أن يبقي Trade Signal في `NO_TRADE`.
 
 لا يفتح هذا المستند أو الكود تفويضاً للتداول أو لإنشاء broker order.

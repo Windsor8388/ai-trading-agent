@@ -8,7 +8,7 @@
 PYTHONPATH=src python -m unittest discover -s tests -v
 ```
 
-الحالات الحالية (73 اختباراً محلياً):
+الحالات الحالية (77 اختباراً محلياً):
 
 - رفض `future/unclosed` bar لمنع look-ahead.
 - رفض ICT evidence على بيانات غير صالحة.
@@ -31,7 +31,8 @@ PYTHONPATH=src python -m unittest discover -s tests -v
 - gap-buffered sizing وgap-risk embargo لا يتجاوزان Risk Management Engine.
 - attribution للأداء وdrawdown recovery حسب strategy/timeframe/session على fixtures زمنية.
 - عقد `BarRequest` يرفض نطاقاً زمنياً غير متزايد قبل أي provider implementation.
-- Operational monitor يميز feed stale وdata-quality incident ويعيد إلى healthy بعد heartbeat/resolve.
+- Operational monitor يميز feed stale وdata-quality incident ويعيد إلى healthy بعد heartbeat/resolve، ويعامل expected feed المفقود أو heartbeat بتاريخ مستقبلي كـ`CRITICAL` بدلاً من green status مضلل.
+- `PlatformDoctor` يختبر محلياً integrity للـknowledge، تطابق bundle، package version، template secrets، Supabase migration safeguards وdashboard boundary؛ ويستطيع verify لـResearchLedger اختيارياً من دون حل secret أو تنفيذ network request.
 - execution lifecycle يحجب `ANALYSIS_ONLY`، ويطلب `ExecutionPolicy` صريحة للـPaper (allowlist/product spec/notional/worst-case risk/active-order/gross-notional limits)، ويمنع تكرار `client_order_id` أو إعادة استخدامه لـimmutable intent مختلف.
 - lifecycle يسجل hash-chained audit عند ربطه بـ`ResearchLedger`، أو يسجل transition ذرياً/idempotent في `SupabaseLifecycleStore` عند ربطه صراحةً؛ يرفض الجمع بين sinkين حتى لا يخفي failure موزعاً. fixture Supabase يثبت URL/secret-reference boundary وcontiguous RPC payload وduplicate retry ورفض local advance عند HTTP failure.
 - lifecycle يحوّل in-flight إلى `UNKNOWN` عند الانقطاع، ويرفض fill reconciliation بلا cumulative quantity موثق، ويحافظ على UNKNOWN أثناء emergency stop حتى المصالحة.
