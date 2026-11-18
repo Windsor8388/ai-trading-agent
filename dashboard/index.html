@@ -35,7 +35,7 @@
     <main id="main" class="shell">
       <section class="hero" aria-labelledby="hero-heading">
         <div class="hero-copy">
-          <p class="eyebrow">SYSTEM CONTROL ROOM · V0.8</p>
+          <p class="eyebrow">SYSTEM CONTROL ROOM · V0.9</p>
           <h2 id="hero-heading">عقل بحثي متعدد المدارس،<br /><em>لا يتداول قبل أن يثبت.</em></h2>
           <p class="hero-text">منصة بحث وتحليل قابلة للتدقيق تجمع مدارس السوق، تفصل الأدلة المترابطة، وتضع حماية رأس المال فوق أي إشارة. هذه الواجهة تعرض حالة النموذج الأولي المحلي فقط — لا يوجد مزود أسعار حي أو وسيط متصل.</p>
           <div class="hero-actions">
@@ -89,7 +89,9 @@
           </aside>
           <aside class="workspace-card rails-card" aria-labelledby="rails-heading">
             <div class="workspace-card-head"><div><span class="small-label">SYSTEM RAILS</span><h3 id="rails-heading">حالة التكاملات</h3></div></div>
-            <ul class="rail-list"><li><span class="rail-dot ready"></span><div><b>Engine catalog</b><small>محلي · 18 قدرة موثقة</small></div></li><li><span class="rail-dot ready"></span><div><b>Risk &amp; audit</b><small>محلي · policy-gated</small></div></li><li><span class="rail-dot idle"></span><div><b>Market data API</b><small>adapter جاهز · غير مهيأ</small></div></li><li><span class="rail-dot idle"></span><div><b>Calendar / news</b><small>data contract فقط</small></div></li></ul>
+            <ul class="rail-list"><li><span class="rail-dot ready"></span><div><b>Engine catalog</b><small>محلي · 18 قدرة موثقة</small></div></li><li><span class="rail-dot ready"></span><div><b>Risk &amp; audit</b><small>محلي · policy-gated</small></div></li><li><span class="rail-dot idle"></span><div><b>Market data API</b><small>adapter جاهز · غير مهيأ</small></div></li><li><span class="rail-dot idle"></span><div><b>Calendar / news</b><small>data contract فقط</small></div></li><li><span class="rail-dot idle"></span><div><b>BingX venue gate</b><small>secret manager + API contract مطلوبان</small></div></li><li><span class="rail-dot off"></span><div><b>Gemini</b><small>معطل بسياسة المستخدم</small></div></li></ul>
+            <p id="control-plane-status" class="control-plane-status" role="status">Control plane server غير متصل بهذه الواجهة static؛ حالة BingX وGemini أعلاه محلية ومحافظة.</p>
+            <button id="refresh-control-plane" class="tiny-button" type="button">تحديث حالة control plane الآمنة</button>
           </aside>
         </div>
       </section>
@@ -159,7 +161,7 @@
             <article class="execution-card"><span class="risk-number">01</span><h3>Policy gate</h3><p>instrument allowlist، contract multiplier، minimum/step، notional وحد المخاطرة؛ لا استنتاج من الرمز.</p></article>
             <article class="execution-card"><span class="risk-number">02</span><h3>Uncertainty is explicit</h3><p>الانقطاع ينقل الأمر إلى <code>UNKNOWN</code>. الغياب من snapshot لا يعني إلغاءه.</p></article>
             <article class="execution-card"><span class="risk-number">03</span><h3>Audit chain</h3><p>يمكن ربط lifecycle بـ JSONL hash-chain محلي؛ فشل append يمنع transition المحلي.</p></article>
-            <article class="execution-card"><span class="risk-number">04</span><h3>Emergency stop</h3><p>يحجب intents الجديدة ويطلب إلغاء الحالة المعروفة؛ أما UNKNOWN فيحتاج reconciliation أولاً.</p></article>
+            <article class="execution-card"><span class="risk-number">04</span><h3>Emergency stop</h3><p>يحجب intents الجديدة ويطلب إلغاء الحالة المعروفة؛ أما UNKNOWN فيحتاج reconciliation أولاً.</p></article><article class="execution-card"><span class="risk-number">05</span><h3>BingX live gate</h3><p>لا يمكن تفعيله من المتصفح: يتطلب secret manager وعقد API مراجعاً وForward Paper وreconciliation/emergency drills وموافقة زمنية مستقلة.</p></article>
           </div>
         </div>
       </section>
@@ -215,7 +217,7 @@
 
       <section id="integrations" class="integration-grid" aria-labelledby="integration-heading">
         <article><p class="eyebrow">BUILD NOW</p><h2 id="integration-heading">المكوّنات المتاحة محلياً</h2><ul><li>Knowledge Base بإصدار ومصادر</li><li>محركات تحليل مستقلة</li><li>CSV historical ingestion + manifest</li><li>OANDA read-only adapter + quality/polling plan</li><li>BOS/CHoCH/MSS وS/R وSupply/Demand context</li><li>Backtest وanalytics وRiskBook</li><li>Paper simulator وhash ledger</li></ul></article>
-        <article class="requires"><p class="eyebrow">REQUIRES EXTERNAL SERVICES</p><h2>قبل البيانات الحية أو التنفيذ</h2><ul><li>تفويض read-only لمزود XAU/USD أو GC مرخّص</li><li>contract specs وbid/ask/calendar</li><li>مخزن دائم وRBAC وaudit</li><li>تقويم أخبار / L2 / tick data عند الحاجة</li><li>موافقة صريحة قبل أي broker API</li></ul></article>
+        <article class="requires"><p class="eyebrow">REQUIRES EXTERNAL SERVICES</p><h2>قبل البيانات الحية أو التنفيذ</h2><ul><li>تفويض read-only لمزود XAU/USD أو GC مرخّص</li><li>contract specs وbid/ask/calendar</li><li>مخزن دائم وRBAC وaudit</li><li>تقويم أخبار / L2 / tick data عند الحاجة</li><li>BingX API contract مثبت الإصدار + server-side secret manager</li><li>Forward Paper/reconciliation/emergency drills ثم موافقة Live زمنية مستقلة</li></ul></article>
       </section>
     </main>
 

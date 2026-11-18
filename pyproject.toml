@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "trading-intelligence"
-version = "0.8.0"
+version = "0.9.0"
 description = "Auditable, analysis-first multi-school trading intelligence prototype"
 requires-python = ">=3.11"
 readme = "docs/ARCHITECTURE_AR.md"
@@ -19,6 +19,7 @@ classifiers = [
 
 [project.scripts]
 trading-intelligence = "trading_intelligence.cli:main"
+trading-intelligence-control-plane = "trading_intelligence.control_plane:serve"
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -1,6 +1,6 @@
 # التصميم المعماري لنظام Trading Intelligence
 
-**الإصدار:** 0.8.0 · **الوضع التشغيلي الحالي:** `ANALYSIS_ONLY` محلي وبدون أي data feed للنظام متصل. يوجد CSV importer وhistorical replay وPaper simulator وrisk/performance analytics وexecution lifecycle محلية، لكنها لا تتصل بسوق أو وسيط. توجد لوحة static مع رسم TradingView خارجي اختياري ومعزول؛ العرض ليس data feed ولا input للمحركات.
+**الإصدار:** 0.9.0 · **الوضع التشغيلي الحالي:** `ANALYSIS_ONLY` محلي وبدون أي data feed للنظام متصل. يوجد CSV importer وhistorical replay وPaper simulator وrisk/performance analytics وexecution lifecycle محلية، لكنها لا تتصل بسوق أو وسيط. توجد لوحة static مع رسم TradingView خارجي اختياري ومعزول؛ العرض ليس data feed ولا input للمحركات.
 التصميم يفصل عمداً البحث والتحليل والورق والتنفيذ. لا يجوز اختصار هذه المسارات لمجرد أن جميعها تستخدم كلمة "signal".
 
 ## 1) المعمارية المستهدفة
@@ -202,6 +202,9 @@ src/trading_intelligence/
   knowledge.py                  # source-validated deterministic concept retrieval
   knowledge_data/               # packaged mirror of the canonical registry
   orchestration.py              # independent multi-TF runner + explicit hash-ledger report recorder
+  agents.py                     # bounded engine/decision/reference-level/risk signal coordinator
+  integrations.py               # Gemini/BingX secret-reference and live-readiness contracts; no sender
+  control_plane.py               # GET-only redacted same-origin runtime status WSGI API; no market/account/order route
   central.py                    # evidence de-correlation/NO_TRADE
   risk.py                       # independent limits, gap-buffered sizing, embargo gates
   risk_book.py                  # local realized-loss/DD/exposure/correlation state
@@ -225,7 +228,7 @@ src/trading_intelligence/
   research/metrics.py           # metrics, bootstrap, temporal folds
   research/analytics.py         # DD/PF/expectancy and strategy/timeframe/session attribution
   research/ledger.py            # append-only SHA-256 experiment/prediction trail
-tests/                          # 57 local deterministic tests (current)
+tests/                          # 63 local deterministic tests (current)
 docs/
   TRADING_INTELLIGENCE_RESEARCH_AR.md
   DATA_SOURCES_AR.md
@@ -236,6 +239,7 @@ docs/
   TRADE_SIGNAL_CONTRACT_AR.md
   ENGINE_CATALOG_AR.md
   INSTRUMENT_UNIVERSE_AR.md
+  LIVE_INTEGRATION_GATES_AR.md
 
 dashboard/                      # static RTL control room; opt-in sandboxed third-party chart only
 ```

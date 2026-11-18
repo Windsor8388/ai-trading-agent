@@ -10,7 +10,7 @@ DASHBOARD = ROOT / "dashboard"
 class DashboardContractTests(unittest.TestCase):
     def test_control_room_makes_offline_and_no_trade_boundaries_visible(self) -> None:
         page = (DASHBOARD / "index.html").read_text(encoding="utf-8")
-        for required in ("V0.8", "ANALYSIS_ONLY", "NO TRADE", "NO ENGINE INPUT", "لا يوجد مزود أسعار حي", "لا تنفيذ حي", "RESEARCH OPERATIONS DESK", "SYSTEM RAILS", "BTC/USD · Crypto spot", "AAPL · Equity"):
+        for required in ("V0.9", "ANALYSIS_ONLY", "NO TRADE", "NO ENGINE INPUT", "لا يوجد مزود أسعار حي", "لا تنفيذ حي", "RESEARCH OPERATIONS DESK", "SYSTEM RAILS", "BTC/USD · Crypto spot", "AAPL · Equity", "BingX venue gate", "Gemini"):
             self.assertIn(required, page)
         self.assertIn('src="about:blank"', page)
         self.assertIn('sandbox="allow-scripts allow-forms allow-popups"', page)
@@ -30,6 +30,11 @@ class DashboardContractTests(unittest.TestCase):
         self.assertIn("chartFrame.src = 'about:blank'", app)
         self.assertIn("trading-intelligence-display-preferences-v1", app)
         self.assertIn("لا تُغذي هذه البيانات محركات القرار", app)
+        self.assertIn("const controlPlanePath = '/api/v1/control-plane/status'", app)
+        self.assertIn("credentials: 'omit'", app)
+        self.assertIn("trade_dispatch !== 'UNAVAILABLE'", app)
+        self.assertNotIn("BINGX_API_KEY", app)
+        self.assertNotIn("BINGX_API_SECRET", app)
 
     def test_vercel_headers_are_valid_and_limit_capabilities(self) -> None:
         config = json.loads((DASHBOARD / "vercel.json").read_text(encoding="utf-8"))

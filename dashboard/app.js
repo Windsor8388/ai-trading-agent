@@ -16,6 +16,8 @@ const chartFrame = document.querySelector('#external-chart');
 const chartPlaceholder = document.querySelector('#chart-placeholder');
 const chartStatus = document.querySelector('#chart-status');
 const chartFrameTitle = document.querySelector('#chart-frame-title');
+const controlPlaneStatus = document.querySelector('#control-plane-status');
+const refreshControlPlane = document.querySelector('#refresh-control-plane');
 
 const preferenceKey = 'trading-intelligence-display-preferences-v1';
 const allowedSymbols = new Set([...chartSymbol.options].map((option) => option.value));
@@ -30,13 +32,50 @@ const symbolLabels = {
 };
 const intervalLabels = { 1: 'M1', 5: 'M5', 15: 'M15', 30: 'M30', 60: 'H1', 240: 'H4', D: 'D1' };
 
-const state = { symbol: 'OANDA:XAUUSD', interval: '15', chartLoaded: false };
+const state = { symbol: 'OANDA:XAUUSD', interval: '15', chartLoaded: false, controlPlane: 'UNREACHABLE' };
+const controlPlanePath = '/api/v1/control-plane/status';
+const integrationStates = new Set(['DISABLED', 'AWAITING_SECRET_BINDING', 'AWAITING_VERIFIED_CONTRACT', 'FORWARD_PAPER_READY', 'LIVE_BLOCKED', 'LIVE_GATE_READY']);
 
 function showToast(message) {
   toast.textContent = message;
   toast.classList.add('show');
   window.clearTimeout(showToast.timeout);
   showToast.timeout = window.setTimeout(() => toast.classList.remove('show'), 4200);
+}
+
+async function refreshControlPlaneStatus() {
+  if (!controlPlaneStatus || !refreshControlPlane) return;
+  refreshControlPlane.disabled = true;
+  controlPlaneStatus.textContent = 'جارٍ طلب حالة control plane الآمنة من نفس origin؛ لن يُرسل المتصفح أي API key أو secret.';
+  try {
+    const response = await fetch(controlPlanePath, {
+      method: 'GET',
+      credentials: 'omit',
+      cache: 'no-store',
+      headers: { Accept: 'application/json' },
+    });
+    if (!response.ok) throw new Error(`status=${response.status}`);
+    const payload = await response.json();
+    const bingxState = payload?.bingx?.state;
+    const geminiState = payload?.gemini?.state;
+    if (
+      payload?.operation_mode !== 'ANALYSIS_ONLY'
+      || payload?.trade_dispatch !== 'UNAVAILABLE'
+      || !integrationStates.has(bingxState)
+      || !integrationStates.has(geminiState)
+    ) {
+      throw new Error('Unexpected control-plane status contract.');
+    }
+    state.controlPlane = bingxState;
+    controlPlaneStatus.textContent = `Control plane وصل بأمان: mode=${payload.operation_mode} · dispatch=${payload.trade_dispatch} · BingX=${bingxState} · Gemini=${geminiState}. لا ينفذ هذا endpoint أمراً ولا يعرض مراجع/قيم الأسرار.`;
+    showToast('تم تحديث حالة control plane الآمنة؛ ما زال تنفيذ التداول غير متاح.');
+  } catch (_) {
+    state.controlPlane = 'UNREACHABLE';
+    controlPlaneStatus.textContent = 'تعذر الوصول إلى control plane بنفس origin. تبقى هذه الواجهة static ولا تفترض اتصال BingX أو بيانات حية أو تنفيذ.';
+    showToast('لا يتوفر control plane في هذا النشر؛ لم يُرسل المتصفح بيانات اعتماد ولم تتغير حدود التداول.');
+  } finally {
+    refreshControlPlane.disabled = false;
+  }
 }
 
 function loadPreferences() {
@@ -141,6 +180,7 @@ tabs.forEach((tab, index) => {
 safetyCheck.addEventListener('click', () => {
   showToast('فحص الأمان: لا يوجد مزود بيانات للنظام، ولا حساب وسيط، والتنفيذ الفعلي محظور. الرسم الخارجي لا يغيّر هذه الحدود.');
 });
+refreshControlPlane.addEventListener('click', refreshControlPlaneStatus);
 
 chartSymbol.addEventListener('change', () => setSymbol(chartSymbol.value));
 workspaceInstrument.addEventListener('change', () => setSymbol(workspaceInstrument.value));
@@ -161,6 +201,7 @@ copySystemSummary.addEventListener('click', async () => {
     `display_symbol=${state.symbol}`,
     `display_interval=${state.interval}`,
     'system_market_data=DISCONNECTED',
+    `control_plane_bingx=${state.controlPlane}`,
     'broker_execution=DISABLED',
     'note=Display preferences are not an analysis snapshot or trading signal.',
   ].join('\n');
