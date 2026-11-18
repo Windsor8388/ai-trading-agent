@@ -8,7 +8,7 @@
 PYTHONPATH=src python -m unittest discover -s tests -v
 ```
 
-الحالات الحالية (43 اختباراً):
+الحالات الحالية (48 اختباراً):
 
 - رفض `future/unclosed` bar لمنع look-ahead.
 - رفض ICT evidence على بيانات غير صالحة.
@@ -40,6 +40,9 @@ PYTHONPATH=src python -m unittest discover -s tests -v
 - range-outlier classifier يضع علامة anomaly ولا يصحح السعر، وVolume Profile engine يرفض اختلاق VAP/TPO/POC من OHLCV.
 - Structure engine يضع BOS/CHoCH/MSS candidate على bars مغلقة فقط؛ وcalendar event gate يختبر embargo زمنيًا على event موثق.
 - paper signal المنظم يحمل conditions ذات حالات `MET/BLOCKED/UNKNOWN` وشرحًا صريحًا أن confidence ليس احتمال ربح.
+- Wyckoff spring candidate وFibonacci confirmed-swing retracement يعملان على fixtures مغلقة فقط؛ ولا يعلنان phase أو سببية ratio.
+- Fundamental event engine يعلن calendar-risk context فقط، وMarket/Volume Profile وClassical Patterns يخرجان missing-input report بدلاً من اختلاق تحليل.
+- Engine catalog موصول بـKnowledgeBase: كل concept ID معلن للمحرك يُتحقق من وجوده ومصدره وعلاقاته عند تحميل السجل.
 
 هذه اختبارات سلوك برنامج وfixture اصطناعية، **وليست Backtest على السوق ولا إثبات ربحية**.
 

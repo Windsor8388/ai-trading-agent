@@ -1,6 +1,6 @@
 # التصميم المعماري لنظام Trading Intelligence
 
-**الإصدار:** 0.5.0 · **الوضع التشغيلي الحالي:** `ANALYSIS_ONLY` محلي وبدون أي data feed للنظام متصل. يوجد CSV importer وhistorical replay وPaper simulator وrisk/performance analytics وexecution lifecycle محلية، لكنها لا تتصل بسوق أو وسيط. توجد لوحة static مع رسم TradingView خارجي اختياري ومعزول؛ العرض ليس data feed ولا input للمحركات.
+**الإصدار:** 0.6.0 · **الوضع التشغيلي الحالي:** `ANALYSIS_ONLY` محلي وبدون أي data feed للنظام متصل. يوجد CSV importer وhistorical replay وPaper simulator وrisk/performance analytics وexecution lifecycle محلية، لكنها لا تتصل بسوق أو وسيط. توجد لوحة static مع رسم TradingView خارجي اختياري ومعزول؛ العرض ليس data feed ولا input للمحركات.
 التصميم يفصل عمداً البحث والتحليل والورق والتنفيذ. لا يجوز اختصار هذه المسارات لمجرد أن جميعها تستخدم كلمة "signal".
 
 ## 1) المعمارية المستهدفة
@@ -158,19 +158,18 @@ class ExecutionVenue(Protocol):
 
 ## 4) المحركات واستقلال المسؤولية
 
-| المحرك | ما يملكه | ما لا يملكه | حالة v0.5 |
+| المحرك | ما يملكه | ما لا يملكه | حالة v0.6 |
 |---|---|---|---|
 | ICT | FVG وequal-high/low sweep heuristics بإصدار | تعريف SMC أو دليل order book | منفذ تجريبي |
-| SMC | structure + displacement/order-block proxy | تنفيذ ICT أو sizing | منفذ تجريبي |
-| Price Action | pivots وstructure | مستويات order block | منفذ تجريبي |
+| SMC / Price Action | pivots، structure، BOS/CHoCH/MSS candidate، displacement/OB proxy | تنفيذ أو sizing | منفذ تجريبي مع correlation cap |
+| Wyckoff | spring/upthrust حول trailing range مغلق؛ phase لا يوسم | accumulation/distribution phase مؤكدة | منفذ candidate محافظ |
+| Supply/Demand & S/R | displacement-zone proxy وATR-normalized pivot clusters | order book أو مستويات بصرية post-hoc | منفذ تجريبي |
+| Fibonacci | retracement حول confirmed opposite pivots | سببية ratio أو anchor discretionary | منفذ feature محافظ |
 | Volume | relative-volume confirmation إذا كان المعنى معروفاً | volume profile/CVD من OHLC | منفذ تجريبي |
-| Quant | SMA 20/50 + volatility gate كـbaseline | claims ML/alpha | منفذ تجريبي |
-| Wyckoff | state machine phase/event | — | backlog بمواصفة |
-| Supply/Demand & Classical | geometry/zone detectors | — | backlog |
-| Profile | TPO/VAP/session auction | footprints | backlog وfeed خاص |
-| Order Flow | delta/CVD/footprint/L2 | OHLC proxy مزعوم كبيانات حقيقية | يعلن unavailable |
-| Fundamental | calendar/news/macros | تفسير خبر بلا مصدر | يعلن unavailable |
-| ML | calibrated models/feature store | تدريب على holdout | gated backlog |
+| Profile | TPO/VAP/session auction | footprints | يعلن DATA_REQUIRED؛ لا اشتقاق من OHLCV |
+| Order Flow | delta/CVD/footprint/L2 | OHLC proxy مزعوم كبيانات حقيقية | يعلن DATA_REQUIRED |
+| Fundamental | timestamped event-risk context | تفسير خبر أو اتجاه بلا feed مرخص | منفذ embargo context؛ feed غير موصول |
+| ML | calibrated models/feature store | تدريب على holdout | gated backlog؛ لا model مدرب |
 
 كل `Evidence` يربط بـ`source_concept_id` في knowledge base. المركز لا يقرأ اسم المدرسة ليعطي وزناً، بل يتعامل مع القياس وcorrelation group وإصدار القاعدة ونتيجة ablation المسجلة لاحقاً.
 
@@ -219,10 +218,12 @@ src/trading_intelligence/
     indicators.py               # transparent no-lookahead primitives
     technical.py                # price action / ICT / SMC / volume / quant engines
     context.py                  # BOS/CHoCH/MSS, S/R, S/D, session and explicit volume-profile boundary
+    advanced.py                 # Wyckoff spring/upthrust, Fibonacci, fundamental-event and unavailable boundaries
+    catalog.py                  # versioned school/concept/input/availability map + explicit default engine set
   research/metrics.py           # metrics, bootstrap, temporal folds
   research/analytics.py         # DD/PF/expectancy and strategy/timeframe/session attribution
   research/ledger.py            # append-only SHA-256 experiment/prediction trail
-tests/                          # 36 local deterministic tests (current)
+tests/                          # 48 local deterministic tests (current)
 docs/
   TRADING_INTELLIGENCE_RESEARCH_AR.md
   DATA_SOURCES_AR.md
@@ -231,6 +232,7 @@ docs/
   DASHBOARD_AR.md
   PROVIDER_PIPELINE_AR.md
   TRADE_SIGNAL_CONTRACT_AR.md
+  ENGINE_CATALOG_AR.md
 
 dashboard/                      # static RTL control room; opt-in sandboxed third-party chart only
 ```

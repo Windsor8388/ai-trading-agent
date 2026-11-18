@@ -1,4 +1,12 @@
-"""Independent, data-bounded analysis engines."""
+"""Independent, data-bounded analysis engines and their versioned capability map."""
+from .advanced import (
+    ClassicalPatternAvailabilityEngine,
+    FibonacciAnalysisEngine,
+    FundamentalEventEngine,
+    MarketProfileAvailabilityEngine,
+    WyckoffAnalysisEngine,
+)
+from .catalog import EngineAvailability, EngineDescriptor, default_research_engines, engine_catalog
 from .context import (
     SessionContextEngine,
     StructureEventEngine,
@@ -16,7 +24,9 @@ from .technical import (
 )
 
 __all__ = [
-    "ICTAnalysisEngine", "PriceActionEngine", "QuantitativeAnalysisEngine", "SMCAnalysisEngine",
-    "SessionContextEngine", "StructureEventEngine", "SupplyDemandEngine", "SupportResistanceEngine",
-    "UnavailableInputEngine", "VolumeAnalysisEngine", "VolumeProfileAvailabilityEngine",
+    "ClassicalPatternAvailabilityEngine", "EngineAvailability", "EngineDescriptor", "FibonacciAnalysisEngine",
+    "FundamentalEventEngine", "ICTAnalysisEngine", "MarketProfileAvailabilityEngine", "PriceActionEngine",
+    "QuantitativeAnalysisEngine", "SMCAnalysisEngine", "SessionContextEngine", "StructureEventEngine",
+    "SupplyDemandEngine", "SupportResistanceEngine", "UnavailableInputEngine", "VolumeAnalysisEngine",
+    "VolumeProfileAvailabilityEngine", "WyckoffAnalysisEngine", "default_research_engines", "engine_catalog",
 ]

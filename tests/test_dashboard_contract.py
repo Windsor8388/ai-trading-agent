@@ -10,7 +10,7 @@ DASHBOARD = ROOT / "dashboard"
 class DashboardContractTests(unittest.TestCase):
     def test_control_room_makes_offline_and_no_trade_boundaries_visible(self) -> None:
         page = (DASHBOARD / "index.html").read_text(encoding="utf-8")
-        for required in ("V0.5", "ANALYSIS_ONLY", "NO TRADE", "NO ENGINE INPUT", "لا يوجد مزود أسعار حي", "لا تنفيذ حي"):
+        for required in ("V0.6", "ANALYSIS_ONLY", "NO TRADE", "NO ENGINE INPUT", "لا يوجد مزود أسعار حي", "لا تنفيذ حي"):
             self.assertIn(required, page)
         self.assertIn('src="about:blank"', page)
         self.assertIn('sandbox="allow-scripts allow-forms allow-popups"', page)

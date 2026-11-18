@@ -11,4 +11,4 @@ from .risk import RiskManagementEngine
 from .risk_book import PortfolioRiskBook
 
 __all__ = ["Candle", "DecisionAction", "KnowledgeBase", "MarketSnapshot", "OperationalMonitor", "PortfolioRiskBook", "RiskManagementEngine", "SignalCondition"]
-__version__ = "0.5.0"
+__version__ = "0.6.0"

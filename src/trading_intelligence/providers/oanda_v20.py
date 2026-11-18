@@ -126,7 +126,7 @@ class OandaV20MarketDataProvider:
         url = self._url(request, vendor_instrument)
         payload = self.transport.get_json(
             url,
-            {"Authorization": f"Bearer {self.config.access_token}", "Accept": "application/json", "User-Agent": "trading-intelligence-read-only/0.5"},
+            {"Authorization": f"Bearer {self.config.access_token}", "Accept": "application/json", "User-Agent": "trading-intelligence-read-only/0.6"},
             self.config.timeout_seconds,
         )
         raw = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
