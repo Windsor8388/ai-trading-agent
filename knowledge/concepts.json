@@ -1,0 +1,1288 @@
+{
+  "schema_version": "1.1",
+  "updated_at": "2026-11-18",
+  "interpretation_rule": "Every concept is a versioned operational hypothesis with declared use cases, validity, invalidation, examples, failure modes, and provenance. Definitions from practitioner schools are not treated as proven alpha until independently tested with frozen rules and out-of-sample data.",
+  "concepts": [
+    {
+      "id": "ict.fair_value_gap",
+      "school": "ICT",
+      "name": "Fair Value Gap",
+      "operational_rule": "At completed bar t, bullish if high[t-2] < low[t]; bearish if low[t-2] > high[t]. Zone boundaries are those two prices.",
+      "inputs": [
+        "closed OHLC"
+      ],
+      "invalidation": "Rule changes only after a separate, versioned fill/mitigation policy.",
+      "relations": [
+        "price_action.imbalance",
+        "smc.imbalance"
+      ],
+      "evidence_status": "heuristic_candidate",
+      "source_ids": [
+        "SRC-ICT-MENTORSHIP"
+      ],
+      "rule_version": "1.0.0",
+      "updated_at": "2026-11-18",
+      "use_cases": [
+        "independent analysis-engine report",
+        "frozen-rule research review"
+      ],
+      "signal_validity": "Valid only when every declared input is available, quality-approved, and point-in-time before as_of; the concept is never standalone execution approval.",
+      "examples": [
+        "Research-only example: apply the frozen operational rule to a completed, lineage-preserved snapshot and retain the measured result with its source references."
+      ],
+      "common_failures": [
+        "Required input is missing, stale, has unknown semantics, or is not point-in-time valid.",
+        "A correlated label is counted as independent evidence or the concept is presented as proven alpha."
+      ],
+      "evidence_notes": "Registry status 'heuristic_candidate' describes the current evidence boundary. Cited sources document definitions, data contracts, or validation controls rather than profitability.",
+      "tags": [
+        "ict",
+        "heuristic_candidate",
+        "versioned-rule",
+        "completed-bars"
+      ]
+    },
+    {
+      "id": "ict.liquidity_sweep",
+      "school": "ICT",
+      "name": "Liquidity sweep",
+      "operational_rule": "Two confirmed pivots within 0.15 ATR define a pool; a later completed bar trades beyond pool by tolerance then closes back through it.",
+      "inputs": [
+        "closed OHLC",
+        "ATR",
+        "confirmed pivots"
+      ],
+      "invalidation": "Close through the opposite side of the sweep premise.",
+      "relations": [
+        "price_action.swing",
+        "liquidity.stop_cluster_proxy"
+      ],
+      "evidence_status": "heuristic_candidate",
+      "source_ids": [
+        "SRC-ICT-MENTORSHIP"
+      ],
+      "rule_version": "1.0.0",
+      "updated_at": "2026-11-18",
+      "use_cases": [
+        "independent analysis-engine report",
+        "frozen-rule research review"
+      ],
+      "signal_validity": "Valid only when every declared input is available, quality-approved, and point-in-time before as_of; the concept is never standalone execution approval.",
+      "examples": [
+        "Research-only example: apply the frozen operational rule to a completed, lineage-preserved snapshot and retain the measured result with its source references."
+      ],
+      "common_failures": [
+        "Required input is missing, stale, has unknown semantics, or is not point-in-time valid.",
+        "A correlated label is counted as independent evidence or the concept is presented as proven alpha."
+      ],
+      "evidence_notes": "Registry status 'heuristic_candidate' describes the current evidence boundary. Cited sources document definitions, data contracts, or validation controls rather than profitability.",
+      "tags": [
+        "ict",
+        "heuristic_candidate",
+        "versioned-rule",
+        "completed-bars"
+      ]
+    },
+    {
+      "id": "ict.order_block",
+      "school": "ICT",
+      "name": "Order block",
+      "operational_rule": "Requires a frozen definition such as last opposite candle before independently defined displacement and structure break; zone and mitigation policy must be explicit.",
+      "inputs": [
+        "closed OHLC",
+        "ATR",
+        "structure"
+      ],
+      "invalidation": "Zone breach defined by chosen policy.",
+      "relations": [
+        "smc.order_block"
+      ],
+      "evidence_status": "heuristic_candidate",
+      "source_ids": [
+        "SRC-ICT-MENTORSHIP"
+      ],
+      "rule_version": "1.0.0",
+      "updated_at": "2026-11-18",
+      "use_cases": [
+        "independent analysis-engine report",
+        "frozen-rule research review"
+      ],
+      "signal_validity": "Valid only when every declared input is available, quality-approved, and point-in-time before as_of; the concept is never standalone execution approval.",
+      "examples": [
+        "Research-only example: apply the frozen operational rule to a completed, lineage-preserved snapshot and retain the measured result with its source references."
+      ],
+      "common_failures": [
+        "Required input is missing, stale, has unknown semantics, or is not point-in-time valid.",
+        "A correlated label is counted as independent evidence or the concept is presented as proven alpha."
+      ],
+      "evidence_notes": "Registry status 'heuristic_candidate' describes the current evidence boundary. Cited sources document definitions, data contracts, or validation controls rather than profitability.",
+      "tags": [
+        "ict",
+        "heuristic_candidate",
+        "versioned-rule",
+        "completed-bars"
+      ]
+    },
+    {
+      "id": "ict.ote",
+      "school": "ICT",
+      "name": "Optimal Trade Entry / PD arrays",
+      "operational_rule": "Retracement bands, premium/discount and dealing ranges must be parameterized from a declared completed swing; no implicit discretionary anchor.",
+      "inputs": [
+        "confirmed swing",
+        "closed OHLC"
+      ],
+      "invalidation": "Anchor swing invalidated/replaced by rule.",
+      "relations": [
+        "fibonacci.retracement"
+      ],
+      "evidence_status": "heuristic_candidate",
+      "source_ids": [
+        "SRC-ICT-MENTORSHIP"
+      ],
+      "rule_version": "1.0.0",
+      "updated_at": "2026-11-18",
+      "use_cases": [
+        "independent analysis-engine report",
+        "frozen-rule research review"
+      ],
+      "signal_validity": "Valid only when every declared input is available, quality-approved, and point-in-time before as_of; the concept is never standalone execution approval.",
+      "examples": [
+        "Research-only example: apply the frozen operational rule to a completed, lineage-preserved snapshot and retain the measured result with its source references."
+      ],
+      "common_failures": [
+        "Required input is missing, stale, has unknown semantics, or is not point-in-time valid.",
+        "A correlated label is counted as independent evidence or the concept is presented as proven alpha."
+      ],
+      "evidence_notes": "Registry status 'heuristic_candidate' describes the current evidence boundary. Cited sources document definitions, data contracts, or validation controls rather than profitability.",
+      "tags": [
+        "ict",
+        "heuristic_candidate",
+        "versioned-rule",
+        "completed-bars"
+      ]
+    },
+    {
+      "id": "smc.order_block",
+      "school": "SMC",
+      "name": "Order-block proxy",
+      "operational_rule": "v0.1: final opposing candle before a >=1.25 ATR body displacement, conditioned on confirmed HH/HL or LH/LL structure.",
+      "inputs": [
+        "closed OHLC",
+        "ATR",
+        "confirmed pivots"
+      ],
+      "invalidation": "Bullish: close below block low; bearish: close above block high.",
+      "relations": [
+        "price_action.market_structure",
+        "ict.order_block"
+      ],
+      "evidence_status": "heuristic_candidate",
+      "source_ids": [
+        "SRC-ICT-MENTORSHIP"
+      ],
+      "rule_version": "1.0.0",
+      "updated_at": "2026-11-18",
+      "use_cases": [
+        "independent analysis-engine report",
+        "frozen-rule research review"
+      ],
+      "signal_validity": "Valid only when every declared input is available, quality-approved, and point-in-time before as_of; the concept is never standalone execution approval.",
+      "examples": [
+        "Research-only example: apply the frozen operational rule to a completed, lineage-preserved snapshot and retain the measured result with its source references."
+      ],
+      "common_failures": [
+        "Required input is missing, stale, has unknown semantics, or is not point-in-time valid.",
+        "A correlated label is counted as independent evidence or the concept is presented as proven alpha."
+      ],
+      "evidence_notes": "Registry status 'heuristic_candidate' describes the current evidence boundary. Cited sources document definitions, data contracts, or validation controls rather than profitability.",
+      "tags": [
+        "smc",
+        "heuristic_candidate",
+        "versioned-rule",
+        "completed-bars"
+      ]
+    },
+    {
+      "id": "smc.bos_choch_mss",
+      "school": "SMC",
+      "name": "BOS, CHoCH, MSS",
+      "operational_rule": "A structure event must name pivot confirmation lag, break threshold, close-versus-wick basis and prior trend state. v0.1 price-action engine reports only confirmed HH/HL/LH/LL and close break proxy.",
+      "inputs": [
+        "confirmed pivots",
+        "closed OHLC"
+      ],
+      "invalidation": "A later confirmed opposite structure sequence.",
+      "relations": [
+        "price_action.market_structure"
+      ],
+      "evidence_status": "heuristic_candidate",
+      "source_ids": [
+        "SRC-ICT-MENTORSHIP"
+      ],
+      "rule_version": "1.0.0",
+      "updated_at": "2026-11-18",
+      "use_cases": [
+        "independent analysis-engine report",
+        "frozen-rule research review"
+      ],
+      "signal_validity": "Valid only when every declared input is available, quality-approved, and point-in-time before as_of; the concept is never standalone execution approval.",
+      "examples": [
+        "Research-only example: apply the frozen operational rule to a completed, lineage-preserved snapshot and retain the measured result with its source references."
+      ],
+      "common_failures": [
+        "Required input is missing, stale, has unknown semantics, or is not point-in-time valid.",
+        "A correlated label is counted as independent evidence or the concept is presented as proven alpha."
+      ],
+      "evidence_notes": "Registry status 'heuristic_candidate' describes the current evidence boundary. Cited sources document definitions, data contracts, or validation controls rather than profitability.",
+      "tags": [
+        "smc",
+        "heuristic_candidate",
+        "versioned-rule",
+        "completed-bars"
+      ]
+    },
+    {
+      "id": "wyckoff.phase",
+      "school": "Wyckoff",
+      "name": "Accumulation/distribution phases",
+      "operational_rule": "Candidate state machine over range boundaries, relative volume, springs/upthrusts and sign of strength/weakness. Must be labelled probabilistic, not annotated after the fact.",
+      "inputs": [
+        "OHLCV",
+        "range state"
+      ],
+      "invalidation": "State-transition rule or range failure.",
+      "relations": [
+        "wyckoff.spring",
+        "volume.relative_volume"
+      ],
+      "evidence_status": "methodology_reference_needs_test",
+      "source_ids": [
+        "SRC-WYCKOFF-INSTITUTE"
+      ],
+      "rule_version": "1.0.0",
+      "updated_at": "2026-11-18",
+      "use_cases": [
+        "independent analysis-engine report",
+        "frozen-rule research review"
+      ],
+      "signal_validity": "Valid only when every declared input is available, quality-approved, and point-in-time before as_of; the concept is never standalone execution approval.",
+      "examples": [
+        "Research-only example: apply the frozen operational rule to a completed, lineage-preserved snapshot and retain the measured result with its source references."
+      ],
+      "common_failures": [
+        "Required input is missing, stale, has unknown semantics, or is not point-in-time valid.",
+        "A correlated label is counted as independent evidence or the concept is presented as proven alpha."
+      ],
+      "evidence_notes": "Registry status 'methodology_reference_needs_test' describes the current evidence boundary. Cited sources document definitions, data contracts, or validation controls rather than profitability.",
+      "tags": [
+        "wyckoff",
+        "methodology_reference_needs_test",
+        "versioned-rule",
+        "completed-bars"
+      ]
+    },
+    {
+      "id": "wyckoff.spring",
+      "school": "Wyckoff",
+      "name": "Spring / upthrust",
+      "operational_rule": "Range boundary excursion followed by close back inside on a completed bar; require predeclared range and volume treatment.",
+      "inputs": [
+        "OHLCV",
+        "range boundaries"
+      ],
+      "invalidation": "Close beyond failed side with configured tolerance.",
+      "relations": [
+        "ict.liquidity_sweep"
+      ],
+      "evidence_status": "methodology_reference_needs_test",
+      "source_ids": [
+        "SRC-WYCKOFF-INSTITUTE"
+      ],
+      "rule_version": "1.0.0",
+      "updated_at": "2026-11-18",
+      "use_cases": [
+        "independent analysis-engine report",
+        "frozen-rule research review"
+      ],
+      "signal_validity": "Valid only when every declared input is available, quality-approved, and point-in-time before as_of; the concept is never standalone execution approval.",
+      "examples": [
+        "Research-only example: apply the frozen operational rule to a completed, lineage-preserved snapshot and retain the measured result with its source references."
+      ],
+      "common_failures": [
+        "Required input is missing, stale, has unknown semantics, or is not point-in-time valid.",
+        "A correlated label is counted as independent evidence or the concept is presented as proven alpha."
+      ],
+      "evidence_notes": "Registry status 'methodology_reference_needs_test' describes the current evidence boundary. Cited sources document definitions, data contracts, or validation controls rather than profitability.",
+      "tags": [
+        "wyckoff",
+        "methodology_reference_needs_test",
+        "versioned-rule",
+        "completed-bars"
+      ]
+    },
+    {
+      "id": "price_action.market_structure",
+      "school": "Price Action",
+      "name": "Market structure",
+      "operational_rule": "v0.1 uses two confirmed pivot highs and lows (wing=2): HH+HL is uptrend; LH+LL downtrend; else range/mixed.",
+      "inputs": [
+        "closed OHLC"
+      ],
+      "invalidation": "Confirmed opposite pivot sequence or configured close break.",
+      "relations": [
+        "smc.bos_choch_mss",
+        "support_resistance.swing"
+      ],
+      "evidence_status": "baseline_heuristic",
+      "source_ids": [
+        "SRC-FAMA-EFFICIENT-MARKETS"
+      ],
+      "rule_version": "1.0.0",
+      "updated_at": "2026-11-18",
+      "use_cases": [
+        "independent analysis-engine report",
+        "frozen-rule research review"
+      ],
+      "signal_validity": "Valid only when every declared input is available, quality-approved, and point-in-time before as_of; the concept is never standalone execution approval.",
+      "examples": [
+        "Research-only example: apply the frozen operational rule to a completed, lineage-preserved snapshot and retain the measured result with its source references."
+      ],
+      "common_failures": [
+        "Required input is missing, stale, has unknown semantics, or is not point-in-time valid.",
+        "A correlated label is counted as independent evidence or the concept is presented as proven alpha."
+      ],
+      "evidence_notes": "Registry status 'baseline_heuristic' describes the current evidence boundary. Cited sources document definitions, data contracts, or validation controls rather than profitability.",
+      "tags": [
+        "price action",
+        "baseline_heuristic",
+        "versioned-rule",
+        "completed-bars"
+      ]
+    },
+    {
+      "id": "price_action.imbalance",
+      "school": "Price Action",
+      "name": "Three-bar imbalance",
+      "operational_rule": "Same raw condition as the FVG detector but held as a price-action label; central engine tags it correlated with ICT/SMC structure.",
+      "inputs": [
+        "closed OHLC"
+      ],
+      "invalidation": "Versioned zone-fill policy.",
+      "relations": [
+        "ict.fair_value_gap"
+      ],
+      "evidence_status": "baseline_heuristic",
+      "source_ids": [
+        "SRC-ICT-MENTORSHIP"
+      ],
+      "rule_version": "1.0.0",
+      "updated_at": "2026-11-18",
+      "use_cases": [
+        "independent analysis-engine report",
+        "frozen-rule research review"
+      ],
+      "signal_validity": "Valid only when every declared input is available, quality-approved, and point-in-time before as_of; the concept is never standalone execution approval.",
+      "examples": [
+        "Research-only example: apply the frozen operational rule to a completed, lineage-preserved snapshot and retain the measured result with its source references."
+      ],
+      "common_failures": [
+        "Required input is missing, stale, has unknown semantics, or is not point-in-time valid.",
+        "A correlated label is counted as independent evidence or the concept is presented as proven alpha."
+      ],
+      "evidence_notes": "Registry status 'baseline_heuristic' describes the current evidence boundary. Cited sources document definitions, data contracts, or validation controls rather than profitability.",
+      "tags": [
+        "price action",
+        "baseline_heuristic",
+        "versioned-rule",
+        "completed-bars"
+      ]
+    },
+    {
+      "id": "supply_demand.zone",
+      "school": "Supply and Demand",
+      "name": "Supply/demand zone",
+      "operational_rule": "Base before an impulsive move; requires mechanical base length, displacement threshold, freshness and touch-count parameters.",
+      "inputs": [
+        "OHLC",
+        "ATR",
+        "volume optional"
+      ],
+      "invalidation": "Configured zone penetration/close.",
+      "relations": [
+        "smc.order_block"
+      ],
+      "evidence_status": "heuristic_candidate",
+      "source_ids": [
+        "SRC-FAMA-EFFICIENT-MARKETS"
+      ],
+      "rule_version": "1.0.0",
+      "updated_at": "2026-11-18",
+      "use_cases": [
+        "independent analysis-engine report",
+        "frozen-rule research review"
+      ],
+      "signal_validity": "Valid only when every declared input is available, quality-approved, and point-in-time before as_of; the concept is never standalone execution approval.",
+      "examples": [
+        "Research-only example: apply the frozen operational rule to a completed, lineage-preserved snapshot and retain the measured result with its source references."
+      ],
+      "common_failures": [
+        "Required input is missing, stale, has unknown semantics, or is not point-in-time valid.",
+        "A correlated label is counted as independent evidence or the concept is presented as proven alpha."
+      ],
+      "evidence_notes": "Registry status 'heuristic_candidate' describes the current evidence boundary. Cited sources document definitions, data contracts, or validation controls rather than profitability.",
+      "tags": [
+        "supply and demand",
+        "heuristic_candidate",
+        "versioned-rule",
+        "completed-bars"
+      ]
+    },
+    {
+      "id": "classical.chart_pattern",
+      "school": "Classical Technical Analysis",
+      "name": "Chart patterns and trend lines",
+      "operational_rule": "Represent as geometric constraints with tolerances and a breakout confirmation/cost model; never label visually post hoc.",
+      "inputs": [
+        "OHLC",
+        "time"
+      ],
+      "invalidation": "Pattern-specific boundary failure.",
+      "relations": [
+        "classical.support_resistance"
+      ],
+      "evidence_status": "candidate_requires_multiple_testing_control",
+      "source_ids": [
+        "SRC-FAMA-EFFICIENT-MARKETS"
+      ],
+      "rule_version": "1.0.0",
+      "updated_at": "2026-11-18",
+      "use_cases": [
+        "independent analysis-engine report",
+        "frozen-rule research review"
+      ],
+      "signal_validity": "Valid only when every declared input is available, quality-approved, and point-in-time before as_of; the concept is never standalone execution approval.",
+      "examples": [
+        "Research-only example: apply the frozen operational rule to a completed, lineage-preserved snapshot and retain the measured result with its source references."
+      ],
+      "common_failures": [
+        "Required input is missing, stale, has unknown semantics, or is not point-in-time valid.",
+        "A correlated label is counted as independent evidence or the concept is presented as proven alpha."
+      ],
+      "evidence_notes": "Registry status 'candidate_requires_multiple_testing_control' describes the current evidence boundary. Cited sources document definitions, data contracts, or validation controls rather than profitability.",
+      "tags": [
+        "classical technical analysis",
+        "candidate_requires_multiple_testing_control",
+        "versioned-rule",
+        "completed-bars"
+      ]
+    },
+    {
+      "id": "support_resistance.swing",
+      "school": "Classical Technical Analysis",
+      "name": "Support/resistance",
+      "operational_rule": "Cluster confirmed pivots by ATR-normalized price distance, retaining touch count and age.",
+      "inputs": [
+        "confirmed pivots",
+        "ATR"
+      ],
+      "invalidation": "Configured close-through or regime shift.",
+      "relations": [
+        "price_action.market_structure"
+      ],
+      "evidence_status": "baseline_heuristic",
+      "source_ids": [
+        "SRC-FAMA-EFFICIENT-MARKETS"
+      ],
+      "rule_version": "1.0.0",
+      "updated_at": "2026-11-18",
+      "use_cases": [
+        "independent analysis-engine report",
+        "frozen-rule research review"
+      ],
+      "signal_validity": "Valid only when every declared input is available, quality-approved, and point-in-time before as_of; the concept is never standalone execution approval.",
+      "examples": [
+        "Research-only example: apply the frozen operational rule to a completed, lineage-preserved snapshot and retain the measured result with its source references."
+      ],
+      "common_failures": [
+        "Required input is missing, stale, has unknown semantics, or is not point-in-time valid.",
+        "A correlated label is counted as independent evidence or the concept is presented as proven alpha."
+      ],
+      "evidence_notes": "Registry status 'baseline_heuristic' describes the current evidence boundary. Cited sources document definitions, data contracts, or validation controls rather than profitability.",
+      "tags": [
+        "classical technical analysis",
+        "baseline_heuristic",
+        "versioned-rule"
+      ]
+    },
+    {
+      "id": "liquidity.stop_cluster_proxy",
+      "school": "Liquidity Trading",
+      "name": "Resting-liquidity proxy",
+      "operational_rule": "OHLC cannot observe resting orders; equal highs/lows are only a proxy hypothesis. Actual liquidity requires L2/order-book data.",
+      "inputs": [
+        "OHLC or L2"
+      ],
+      "invalidation": "Data-type mismatch must block assertion.",
+      "relations": [
+        "ict.liquidity_sweep",
+        "orderflow.order_book_imbalance"
+      ],
+      "evidence_status": "data_limited_hypothesis",
+      "source_ids": [
+        "SRC-HASBROUCK-MICROSTRUCTURE"
+      ],
+      "rule_version": "1.0.0",
+      "updated_at": "2026-11-18",
+      "use_cases": [
+        "independent analysis-engine report",
+        "frozen-rule research review"
+      ],
+      "signal_validity": "Valid only when every declared input is available, quality-approved, and point-in-time before as_of; the concept is never standalone execution approval.",
+      "examples": [
+        "Research-only example: apply the frozen operational rule to a completed, lineage-preserved snapshot and retain the measured result with its source references."
+      ],
+      "common_failures": [
+        "Required input is missing, stale, has unknown semantics, or is not point-in-time valid.",
+        "A correlated label is counted as independent evidence or the concept is presented as proven alpha."
+      ],
+      "evidence_notes": "Registry status 'data_limited_hypothesis' describes the current evidence boundary. Cited sources document definitions, data contracts, or validation controls rather than profitability.",
+      "tags": [
+        "liquidity trading",
+        "data_limited_hypothesis",
+        "versioned-rule",
+        "completed-bars"
+      ]
+    },
+    {
+      "id": "market_profile.auction",
+      "school": "Market/Volume Profile",
+      "name": "Auction/profile value area",
+      "operational_rule": "Build time-price opportunity or volume-at-price histogram from session data, document session and bin size; derive POC/value-area mechanically.",
+      "inputs": [
+        "intraday time-price or volume-at-price",
+        "session calendar"
+      ],
+      "invalidation": "Session definition/data-quality failure.",
+      "relations": [
+        "volume_profile.poc"
+      ],
+      "evidence_status": "methodology_reference_needs_test",
+      "source_ids": [
+        "SRC-HASBROUCK-MICROSTRUCTURE"
+      ],
+      "rule_version": "1.0.0",
+      "updated_at": "2026-11-18",
+      "use_cases": [
+        "independent analysis-engine report",
+        "frozen-rule research review"
+      ],
+      "signal_validity": "Valid only when every declared input is available, quality-approved, and point-in-time before as_of; the concept is never standalone execution approval.",
+      "examples": [
+        "Research-only example: apply the frozen operational rule to a completed, lineage-preserved snapshot and retain the measured result with its source references."
+      ],
+      "common_failures": [
+        "Required input is missing, stale, has unknown semantics, or is not point-in-time valid.",
+        "A correlated label is counted as independent evidence or the concept is presented as proven alpha."
+      ],
+      "evidence_notes": "Registry status 'methodology_reference_needs_test' describes the current evidence boundary. Cited sources document definitions, data contracts, or validation controls rather than profitability.",
+      "tags": [
+        "market/volume profile",
+        "methodology_reference_needs_test",
+        "versioned-rule"
+      ]
+    },
+    {
+      "id": "volume_profile.poc",
+      "school": "Volume Profile",
+      "name": "POC and value area",
+      "operational_rule": "Use actual trade volume at price when available; broker tick-volume is not a substitute without a documented proxy study.",
+      "inputs": [
+        "trade prints or vendor volume-at-price"
+      ],
+      "invalidation": "No valid volume-at-price input.",
+      "relations": [
+        "market_profile.auction"
+      ],
+      "evidence_status": "data_requirement",
+      "source_ids": [
+        "SRC-HASBROUCK-MICROSTRUCTURE"
+      ],
+      "rule_version": "1.0.0",
+      "updated_at": "2026-11-18",
+      "use_cases": [
+        "independent analysis-engine report",
+        "frozen-rule research review"
+      ],
+      "signal_validity": "Valid only when every declared input is available, quality-approved, and point-in-time before as_of; the concept is never standalone execution approval.",
+      "examples": [
+        "Research-only example: apply the frozen operational rule to a completed, lineage-preserved snapshot and retain the measured result with its source references."
+      ],
+      "common_failures": [
+        "Required input is missing, stale, has unknown semantics, or is not point-in-time valid.",
+        "A correlated label is counted as independent evidence or the concept is presented as proven alpha."
+      ],
+      "evidence_notes": "Registry status 'data_requirement' describes the current evidence boundary. Cited sources document definitions, data contracts, or validation controls rather than profitability.",
+      "tags": [
+        "volume profile",
+        "data_requirement",
+        "versioned-rule"
+      ]
+    },
+    {
+      "id": "orderflow.delta_cvd",
+      "school": "Order Flow",
+      "name": "Delta/CVD",
+      "operational_rule": "Classify aggressor-side trades under a declared quote/trade-signing rule, aggregate buy minus sell volume, retain unknown-class rate.",
+      "inputs": [
+        "tick trades",
+        "quotes/order book"
+      ],
+      "invalidation": "Missing trade/quote data or excessive unclassified prints.",
+      "relations": [
+        "orderflow.footprint"
+      ],
+      "evidence_status": "microstructure_measure_not_signal",
+      "source_ids": [
+        "SRC-HASBROUCK-MICROSTRUCTURE"
+      ],
+      "rule_version": "1.0.0",
+      "updated_at": "2026-11-18",
+      "use_cases": [
+        "independent analysis-engine report",
+        "frozen-rule research review"
+      ],
+      "signal_validity": "Valid only when every declared input is available, quality-approved, and point-in-time before as_of; the concept is never standalone execution approval.",
+      "examples": [
+        "Research-only example: apply the frozen operational rule to a completed, lineage-preserved snapshot and retain the measured result with its source references."
+      ],
+      "common_failures": [
+        "Required input is missing, stale, has unknown semantics, or is not point-in-time valid.",
+        "A correlated label is counted as independent evidence or the concept is presented as proven alpha."
+      ],
+      "evidence_notes": "Registry status 'microstructure_measure_not_signal' describes the current evidence boundary. Cited sources document definitions, data contracts, or validation controls rather than profitability.",
+      "tags": [
+        "order flow",
+        "microstructure_measure_not_signal",
+        "versioned-rule"
+      ]
+    },
+    {
+      "id": "orderflow.footprint",
+      "school": "Order Flow",
+      "name": "Footprint",
+      "operational_rule": "Price-level bid/ask executed volume matrix; requires tick/market-by-order or equivalent vendor data and explicit session roll treatment.",
+      "inputs": [
+        "price-level trade data"
+      ],
+      "invalidation": "OHLCV-only feed cannot produce a footprint.",
+      "relations": [
+        "orderflow.delta_cvd"
+      ],
+      "evidence_status": "data_requirement",
+      "source_ids": [
+        "SRC-HASBROUCK-MICROSTRUCTURE"
+      ],
+      "rule_version": "1.0.0",
+      "updated_at": "2026-11-18",
+      "use_cases": [
+        "independent analysis-engine report",
+        "frozen-rule research review"
+      ],
+      "signal_validity": "Valid only when every declared input is available, quality-approved, and point-in-time before as_of; the concept is never standalone execution approval.",
+      "examples": [
+        "Research-only example: apply the frozen operational rule to a completed, lineage-preserved snapshot and retain the measured result with its source references."
+      ],
+      "common_failures": [
+        "Required input is missing, stale, has unknown semantics, or is not point-in-time valid.",
+        "A correlated label is counted as independent evidence or the concept is presented as proven alpha."
+      ],
+      "evidence_notes": "Registry status 'data_requirement' describes the current evidence boundary. Cited sources document definitions, data contracts, or validation controls rather than profitability.",
+      "tags": [
+        "order flow",
+        "data_requirement",
+        "versioned-rule"
+      ]
+    },
+    {
+      "id": "fibonacci.retracement",
+      "school": "Fibonacci",
+      "name": "Retracement/extension",
+      "operational_rule": "Select a confirmed anchor swing by rule; calculate fixed ratios and test as a feature, not causal law.",
+      "inputs": [
+        "confirmed swings",
+        "OHLC"
+      ],
+      "invalidation": "Anchor replacement rule.",
+      "relations": [
+        "ict.ote"
+      ],
+      "evidence_status": "heuristic_candidate",
+      "source_ids": [
+        "SRC-FAMA-EFFICIENT-MARKETS"
+      ],
+      "rule_version": "1.0.0",
+      "updated_at": "2026-11-18",
+      "use_cases": [
+        "independent analysis-engine report",
+        "frozen-rule research review"
+      ],
+      "signal_validity": "Valid only when every declared input is available, quality-approved, and point-in-time before as_of; the concept is never standalone execution approval.",
+      "examples": [
+        "Research-only example: apply the frozen operational rule to a completed, lineage-preserved snapshot and retain the measured result with its source references."
+      ],
+      "common_failures": [
+        "Required input is missing, stale, has unknown semantics, or is not point-in-time valid.",
+        "A correlated label is counted as independent evidence or the concept is presented as proven alpha."
+      ],
+      "evidence_notes": "Registry status 'heuristic_candidate' describes the current evidence boundary. Cited sources document definitions, data contracts, or validation controls rather than profitability.",
+      "tags": [
+        "fibonacci",
+        "heuristic_candidate",
+        "versioned-rule",
+        "completed-bars"
+      ]
+    },
+    {
+      "id": "quant.trend_baseline",
+      "school": "Quantitative",
+      "name": "Trend baseline",
+      "operational_rule": "v0.1: 20/50 SMA direction only if 20-bar realized-volatility percentile proxy <= 0.90; parameters frozen per experiment.",
+      "inputs": [
+        "closed OHLC"
+      ],
+      "invalidation": "Average cross or volatility gate breach.",
+      "relations": [
+        "quant.regime"
+      ],
+      "evidence_status": "baseline_to_test",
+      "source_ids": [
+        "SRC-BAILEY-PBO",
+        "SRC-BAILEY-DSR"
+      ],
+      "rule_version": "1.0.0",
+      "updated_at": "2026-11-18",
+      "use_cases": [
+        "independent analysis-engine report",
+        "frozen-rule research review"
+      ],
+      "signal_validity": "Valid only when every declared input is available, quality-approved, and point-in-time before as_of; the concept is never standalone execution approval.",
+      "examples": [
+        "Research-only example: apply the frozen operational rule to a completed, lineage-preserved snapshot and retain the measured result with its source references."
+      ],
+      "common_failures": [
+        "Required input is missing, stale, has unknown semantics, or is not point-in-time valid.",
+        "A correlated label is counted as independent evidence or the concept is presented as proven alpha."
+      ],
+      "evidence_notes": "Registry status 'baseline_to_test' describes the current evidence boundary. Cited sources document definitions, data contracts, or validation controls rather than profitability.",
+      "tags": [
+        "quantitative",
+        "baseline_to_test",
+        "versioned-rule",
+        "completed-bars"
+      ]
+    },
+    {
+      "id": "quant.regime",
+      "school": "Quantitative",
+      "name": "Regime detection",
+      "operational_rule": "Start with transparent trend/range/high-volatility rules; compare later HMM/classifier only on locked out-of-sample performance.",
+      "inputs": [
+        "returns",
+        "volatility",
+        "volume optional"
+      ],
+      "invalidation": "Regime confidence below threshold or model drift.",
+      "relations": [
+        "ml.regime_classifier"
+      ],
+      "evidence_status": "baseline_first",
+      "source_ids": [
+        "SRC-BAILEY-PBO"
+      ],
+      "rule_version": "1.0.0",
+      "updated_at": "2026-11-18",
+      "use_cases": [
+        "independent analysis-engine report",
+        "frozen-rule research review"
+      ],
+      "signal_validity": "Valid only when every declared input is available, quality-approved, and point-in-time before as_of; the concept is never standalone execution approval.",
+      "examples": [
+        "Research-only example: apply the frozen operational rule to a completed, lineage-preserved snapshot and retain the measured result with its source references."
+      ],
+      "common_failures": [
+        "Required input is missing, stale, has unknown semantics, or is not point-in-time valid.",
+        "A correlated label is counted as independent evidence or the concept is presented as proven alpha."
+      ],
+      "evidence_notes": "Registry status 'baseline_first' describes the current evidence boundary. Cited sources document definitions, data contracts, or validation controls rather than profitability.",
+      "tags": [
+        "quantitative",
+        "baseline_first",
+        "versioned-rule"
+      ]
+    },
+    {
+      "id": "fundamental.event_risk",
+      "school": "Fundamental/Macro",
+      "name": "Scheduled-event risk",
+      "operational_rule": "Store event release time in UTC, consensus/actual/revision provenance and an embargo policy. Do not infer news from price after release.",
+      "inputs": [
+        "licensed economic calendar/news feed"
+      ],
+      "invalidation": "Missing event timestamp or provider lineage.",
+      "relations": [
+        "risk.event_embargo"
+      ],
+      "evidence_status": "data_requirement",
+      "source_ids": [
+        "SRC-CFTC-GOLD-RISK"
+      ],
+      "rule_version": "1.0.0",
+      "updated_at": "2026-11-18",
+      "use_cases": [
+        "independent analysis-engine report",
+        "frozen-rule research review"
+      ],
+      "signal_validity": "Valid only when every declared input is available, quality-approved, and point-in-time before as_of; the concept is never standalone execution approval.",
+      "examples": [
+        "Research-only example: apply the frozen operational rule to a completed, lineage-preserved snapshot and retain the measured result with its source references."
+      ],
+      "common_failures": [
+        "Required input is missing, stale, has unknown semantics, or is not point-in-time valid.",
+        "A correlated label is counted as independent evidence or the concept is presented as proven alpha."
+      ],
+      "evidence_notes": "Registry status 'data_requirement' describes the current evidence boundary. Cited sources document definitions, data contracts, or validation controls rather than profitability.",
+      "tags": [
+        "fundamental/macro",
+        "data_requirement",
+        "versioned-rule"
+      ]
+    },
+    {
+      "id": "ml.regime_classifier",
+      "school": "Machine Learning",
+      "name": "Regime classifier",
+      "operational_rule": "Feature timestamps must precede label; use purged/temporal validation and compare versus transparent regime baseline. Deploy only if independent improvement clears a precommitted threshold.",
+      "inputs": [
+        "versioned feature set",
+        "labels",
+        "temporal folds"
+      ],
+      "invalidation": "Drift, calibration failure, or no OOS lift.",
+      "relations": [
+        "quant.regime",
+        "validation.walk_forward"
+      ],
+      "evidence_status": "conditional_on_oos_lift",
+      "source_ids": [
+        "SRC-BAILEY-PBO",
+        "SRC-BAILEY-DSR"
+      ],
+      "rule_version": "1.0.0",
+      "updated_at": "2026-11-18",
+      "use_cases": [
+        "independent analysis-engine report",
+        "frozen-rule research review"
+      ],
+      "signal_validity": "Valid only when every declared input is available, quality-approved, and point-in-time before as_of; the concept is never standalone execution approval.",
+      "examples": [
+        "Research-only example: apply the frozen operational rule to a completed, lineage-preserved snapshot and retain the measured result with its source references."
+      ],
+      "common_failures": [
+        "Required input is missing, stale, has unknown semantics, or is not point-in-time valid.",
+        "A correlated label is counted as independent evidence or the concept is presented as proven alpha."
+      ],
+      "evidence_notes": "Registry status 'conditional_on_oos_lift' describes the current evidence boundary. Cited sources document definitions, data contracts, or validation controls rather than profitability.",
+      "tags": [
+        "machine learning",
+        "conditional_on_oos_lift",
+        "versioned-rule"
+      ]
+    },
+    {
+      "id": "validation.walk_forward",
+      "school": "Research Validation",
+      "name": "Walk-forward validation",
+      "operational_rule": "Chronological expanding/rolling train folds strictly precede test folds. Final holdout stays unopened until selection freezes.",
+      "inputs": [
+        "timestamped data",
+        "experiment ledger"
+      ],
+      "invalidation": "Any train/test overlap or tuning on final holdout.",
+      "relations": [
+        "validation.pbo"
+      ],
+      "evidence_status": "required_control",
+      "source_ids": [
+        "SRC-BAILEY-PBO"
+      ],
+      "rule_version": "1.0.0",
+      "updated_at": "2026-11-18",
+      "use_cases": [
+        "independent analysis-engine report",
+        "frozen-rule research review"
+      ],
+      "signal_validity": "Valid only when every declared input is available, quality-approved, and point-in-time before as_of; the concept is never standalone execution approval.",
+      "examples": [
+        "Research-only example: apply the frozen operational rule to a completed, lineage-preserved snapshot and retain the measured result with its source references."
+      ],
+      "common_failures": [
+        "Required input is missing, stale, has unknown semantics, or is not point-in-time valid.",
+        "A correlated label is counted as independent evidence or the concept is presented as proven alpha."
+      ],
+      "evidence_notes": "Registry status 'required_control' describes the current evidence boundary. Cited sources document definitions, data contracts, or validation controls rather than profitability.",
+      "tags": [
+        "research validation",
+        "required_control",
+        "versioned-rule"
+      ]
+    },
+    {
+      "id": "validation.pbo",
+      "school": "Research Validation",
+      "name": "Probability of Backtest Overfitting",
+      "operational_rule": "Apply CSCV/PBO to candidate trial-return matrix where applicable; record all trials, not just selected winners.",
+      "inputs": [
+        "all trial returns",
+        "precommitted selection metric"
+      ],
+      "invalidation": "Missing trial ledger or insufficient design assumptions.",
+      "relations": [
+        "validation.deflated_sharpe"
+      ],
+      "evidence_status": "required_when_model_search_is_material",
+      "source_ids": [
+        "SRC-BAILEY-PBO"
+      ],
+      "rule_version": "1.0.0",
+      "updated_at": "2026-11-18",
+      "use_cases": [
+        "independent analysis-engine report",
+        "frozen-rule research review"
+      ],
+      "signal_validity": "Valid only when every declared input is available, quality-approved, and point-in-time before as_of; the concept is never standalone execution approval.",
+      "examples": [
+        "Research-only example: apply the frozen operational rule to a completed, lineage-preserved snapshot and retain the measured result with its source references."
+      ],
+      "common_failures": [
+        "Required input is missing, stale, has unknown semantics, or is not point-in-time valid.",
+        "A correlated label is counted as independent evidence or the concept is presented as proven alpha."
+      ],
+      "evidence_notes": "Registry status 'required_when_model_search_is_material' describes the current evidence boundary. Cited sources document definitions, data contracts, or validation controls rather than profitability.",
+      "tags": [
+        "research validation",
+        "required_when_model_search_is_material",
+        "versioned-rule"
+      ]
+    },
+    {
+      "id": "validation.deflated_sharpe",
+      "school": "Research Validation",
+      "name": "Deflated Sharpe Ratio",
+      "operational_rule": "Assess Sharpe with trial-count and return-distribution assumptions documented; never report it as a standalone guarantee.",
+      "inputs": [
+        "returns",
+        "trial count",
+        "distribution moments"
+      ],
+      "invalidation": "Undocumented trials/assumptions.",
+      "relations": [
+        "validation.pbo"
+      ],
+      "evidence_status": "recommended_control",
+      "source_ids": [
+        "SRC-BAILEY-DSR"
+      ],
+      "rule_version": "1.0.0",
+      "updated_at": "2026-11-18",
+      "use_cases": [
+        "independent analysis-engine report",
+        "frozen-rule research review"
+      ],
+      "signal_validity": "Valid only when every declared input is available, quality-approved, and point-in-time before as_of; the concept is never standalone execution approval.",
+      "examples": [
+        "Research-only example: apply the frozen operational rule to a completed, lineage-preserved snapshot and retain the measured result with its source references."
+      ],
+      "common_failures": [
+        "Required input is missing, stale, has unknown semantics, or is not point-in-time valid.",
+        "A correlated label is counted as independent evidence or the concept is presented as proven alpha."
+      ],
+      "evidence_notes": "Registry status 'recommended_control' describes the current evidence boundary. Cited sources document definitions, data contracts, or validation controls rather than profitability.",
+      "tags": [
+        "research validation",
+        "recommended_control",
+        "versioned-rule"
+      ]
+    },
+    {
+      "id": "risk.event_embargo",
+      "school": "Risk Management",
+      "name": "Event embargo",
+      "operational_rule": "Block new entries during a configurable window around high-impact scheduled events; different instruments require explicit calendar mapping.",
+      "inputs": [
+        "event calendar",
+        "instrument mapping",
+        "UTC clock"
+      ],
+      "invalidation": "Calendar unavailable/stale means risk state must become unknown, not safe.",
+      "relations": [
+        "fundamental.event_risk"
+      ],
+      "evidence_status": "risk_control",
+      "source_ids": [
+        "SRC-CFTC-GOLD-RISK"
+      ],
+      "rule_version": "1.0.0",
+      "updated_at": "2026-11-18",
+      "use_cases": [
+        "independent analysis-engine report",
+        "frozen-rule research review"
+      ],
+      "signal_validity": "Valid only when every declared input is available, quality-approved, and point-in-time before as_of; the concept is never standalone execution approval.",
+      "examples": [
+        "Research-only example: apply the frozen operational rule to a completed, lineage-preserved snapshot and retain the measured result with its source references."
+      ],
+      "common_failures": [
+        "Required input is missing, stale, has unknown semantics, or is not point-in-time valid.",
+        "A correlated label is counted as independent evidence or the concept is presented as proven alpha."
+      ],
+      "evidence_notes": "Registry status 'risk_control' describes the current evidence boundary. Cited sources document definitions, data contracts, or validation controls rather than profitability.",
+      "tags": [
+        "risk management",
+        "risk_control",
+        "versioned-rule"
+      ]
+    },
+    {
+      "id": "smc.imbalance",
+      "school": "SMC",
+      "name": "Imbalance",
+      "operational_rule": "A separately named SMC imbalance must state its completed-bar condition, zone boundaries and mitigation rule. v0.1 aliases no extra score beyond its market-structure correlation group.",
+      "inputs": [
+        "closed OHLC"
+      ],
+      "invalidation": "Versioned fill/mitigation policy.",
+      "relations": [
+        "ict.fair_value_gap",
+        "price_action.imbalance"
+      ],
+      "evidence_status": "heuristic_candidate",
+      "source_ids": [
+        "SRC-ICT-MENTORSHIP"
+      ],
+      "rule_version": "1.0.0",
+      "updated_at": "2026-11-18",
+      "use_cases": [
+        "independent analysis-engine report",
+        "frozen-rule research review"
+      ],
+      "signal_validity": "Valid only when every declared input is available, quality-approved, and point-in-time before as_of; the concept is never standalone execution approval.",
+      "examples": [
+        "Research-only example: apply the frozen operational rule to a completed, lineage-preserved snapshot and retain the measured result with its source references."
+      ],
+      "common_failures": [
+        "Required input is missing, stale, has unknown semantics, or is not point-in-time valid.",
+        "A correlated label is counted as independent evidence or the concept is presented as proven alpha."
+      ],
+      "evidence_notes": "Registry status 'heuristic_candidate' describes the current evidence boundary. Cited sources document definitions, data contracts, or validation controls rather than profitability.",
+      "tags": [
+        "smc",
+        "heuristic_candidate",
+        "versioned-rule",
+        "completed-bars"
+      ]
+    },
+    {
+      "id": "price_action.swing",
+      "school": "Price Action",
+      "name": "Confirmed swing",
+      "operational_rule": "v0.1 marks a high/low only after wing=2 later closed bars; unconfirmed latest extrema are not signals.",
+      "inputs": [
+        "closed OHLC"
+      ],
+      "invalidation": "A later bar may prevent an extrema from becoming confirmed; confirmed pivot remains an historical observation.",
+      "relations": [
+        "price_action.market_structure"
+      ],
+      "evidence_status": "measurement_definition",
+      "source_ids": [
+        "SRC-FAMA-EFFICIENT-MARKETS"
+      ],
+      "rule_version": "1.0.0",
+      "updated_at": "2026-11-18",
+      "use_cases": [
+        "independent analysis-engine report",
+        "frozen-rule research review"
+      ],
+      "signal_validity": "Valid only when every declared input is available, quality-approved, and point-in-time before as_of; the concept is never standalone execution approval.",
+      "examples": [
+        "Research-only example: apply the frozen operational rule to a completed, lineage-preserved snapshot and retain the measured result with its source references."
+      ],
+      "common_failures": [
+        "Required input is missing, stale, has unknown semantics, or is not point-in-time valid.",
+        "A correlated label is counted as independent evidence or the concept is presented as proven alpha."
+      ],
+      "evidence_notes": "Registry status 'measurement_definition' describes the current evidence boundary. Cited sources document definitions, data contracts, or validation controls rather than profitability.",
+      "tags": [
+        "price action",
+        "measurement_definition",
+        "versioned-rule",
+        "completed-bars"
+      ]
+    },
+    {
+      "id": "volume.relative_volume",
+      "school": "Volume",
+      "name": "Relative volume",
+      "operational_rule": "Compare current completed-bar volume with an explicitly selected trailing distribution and same-session semantics when available; preserve whether it is trade or tick volume.",
+      "inputs": [
+        "OHLCV volume with documented semantics"
+      ],
+      "invalidation": "Provider volume semantics missing or changed.",
+      "relations": [
+        "volume_profile.poc"
+      ],
+      "evidence_status": "confirmation_candidate",
+      "source_ids": [
+        "SRC-HASBROUCK-MICROSTRUCTURE"
+      ],
+      "rule_version": "1.0.0",
+      "updated_at": "2026-11-18",
+      "use_cases": [
+        "independent analysis-engine report",
+        "frozen-rule research review"
+      ],
+      "signal_validity": "Valid only when every declared input is available, quality-approved, and point-in-time before as_of; the concept is never standalone execution approval.",
+      "examples": [
+        "Research-only example: apply the frozen operational rule to a completed, lineage-preserved snapshot and retain the measured result with its source references."
+      ],
+      "common_failures": [
+        "Required input is missing, stale, has unknown semantics, or is not point-in-time valid.",
+        "A correlated label is counted as independent evidence or the concept is presented as proven alpha."
+      ],
+      "evidence_notes": "Registry status 'confirmation_candidate' describes the current evidence boundary. Cited sources document definitions, data contracts, or validation controls rather than profitability.",
+      "tags": [
+        "volume",
+        "confirmation_candidate",
+        "versioned-rule",
+        "completed-bars"
+      ]
+    },
+    {
+      "id": "classical.support_resistance",
+      "school": "Classical Technical Analysis",
+      "name": "Support and resistance",
+      "operational_rule": "Cluster confirmed swing prices using an ATR-normalized tolerance and record touches, age and resolution; do not draw subjective lines.",
+      "inputs": [
+        "confirmed pivots",
+        "ATR"
+      ],
+      "invalidation": "Configured close-through threshold or time expiry.",
+      "relations": [
+        "support_resistance.swing"
+      ],
+      "evidence_status": "baseline_heuristic",
+      "source_ids": [
+        "SRC-FAMA-EFFICIENT-MARKETS"
+      ],
+      "rule_version": "1.0.0",
+      "updated_at": "2026-11-18",
+      "use_cases": [
+        "independent analysis-engine report",
+        "frozen-rule research review"
+      ],
+      "signal_validity": "Valid only when every declared input is available, quality-approved, and point-in-time before as_of; the concept is never standalone execution approval.",
+      "examples": [
+        "Research-only example: apply the frozen operational rule to a completed, lineage-preserved snapshot and retain the measured result with its source references."
+      ],
+      "common_failures": [
+        "Required input is missing, stale, has unknown semantics, or is not point-in-time valid.",
+        "A correlated label is counted as independent evidence or the concept is presented as proven alpha."
+      ],
+      "evidence_notes": "Registry status 'baseline_heuristic' describes the current evidence boundary. Cited sources document definitions, data contracts, or validation controls rather than profitability.",
+      "tags": [
+        "classical technical analysis",
+        "baseline_heuristic",
+        "versioned-rule"
+      ]
+    },
+    {
+      "id": "orderflow.order_book_imbalance",
+      "school": "Order Flow",
+      "name": "Order-book imbalance",
+      "operational_rule": "Calculate displayed bid/ask depth imbalance only from synchronized order-book updates, preserving venue, depth and cancellation/latency limitations.",
+      "inputs": [
+        "L2/order-book updates",
+        "venue sequence data"
+      ],
+      "invalidation": "Stale, gapped or cross-venue mixed order book.",
+      "relations": [
+        "orderflow.delta_cvd"
+      ],
+      "evidence_status": "microstructure_measure_not_signal",
+      "source_ids": [
+        "SRC-HASBROUCK-MICROSTRUCTURE"
+      ],
+      "rule_version": "1.0.0",
+      "updated_at": "2026-11-18",
+      "use_cases": [
+        "independent analysis-engine report",
+        "frozen-rule research review"
+      ],
+      "signal_validity": "Valid only when every declared input is available, quality-approved, and point-in-time before as_of; the concept is never standalone execution approval.",
+      "examples": [
+        "Research-only example: apply the frozen operational rule to a completed, lineage-preserved snapshot and retain the measured result with its source references."
+      ],
+      "common_failures": [
+        "Required input is missing, stale, has unknown semantics, or is not point-in-time valid.",
+        "A correlated label is counted as independent evidence or the concept is presented as proven alpha."
+      ],
+      "evidence_notes": "Registry status 'microstructure_measure_not_signal' describes the current evidence boundary. Cited sources document definitions, data contracts, or validation controls rather than profitability.",
+      "tags": [
+        "order flow",
+        "microstructure_measure_not_signal",
+        "versioned-rule"
+      ]
+    },
+    {
+      "id": "market_context.session_utc",
+      "school": "Market Context",
+      "name": "UTC session context",
+      "rule_version": "1.0.0",
+      "updated_at": "2026-11-18",
+      "operational_rule": "Label a completed bar by a declared generic UTC session window. This is context only and does not replace an exchange, broker, holiday, or DST calendar.",
+      "inputs": [
+        "closed OHLC",
+        "UTC-normalized timestamp",
+        "versioned session policy"
+      ],
+      "use_cases": [
+        "independent analysis-engine report",
+        "session-conditioned research review"
+      ],
+      "signal_validity": "Valid only as a UTC context label after timestamp normalization. It cannot approve an entry or assert an exchange trading session.",
+      "invalidation": "Invalidate or withhold the label when a product-specific exchange/broker/DST policy is required but not supplied.",
+      "examples": [
+        "Research-only example: label a closed UTC bar with the declared generic session and record that it is not an exchange calendar."
+      ],
+      "common_failures": [
+        "Applying generic UTC windows as an exchange holiday or DST policy.",
+        "Using a session label as independent directional evidence."
+      ],
+      "evidence_notes": "The label is operational context, not alpha. Provider timestamp semantics and product calendar must be validated separately.",
+      "tags": [
+        "market-context",
+        "sessions",
+        "utc",
+        "versioned-rule"
+      ],
+      "relations": [
+        "fundamental.event_risk"
+      ],
+      "evidence_status": "context_only",
+      "source_ids": [
+        "SRC-OANDA-CANDLES"
+      ]
+    }
+  ]
+}

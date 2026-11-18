@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="referrer" content="no-referrer" />
+    <title>رسم خارجي معزول</title>
+    <style>
+      :root{color-scheme:dark}body{margin:0;background:#09131f;color:#d9e8ed;font:14px Tahoma,"Segoe UI",Arial,sans-serif}.chart-loading{height:100%;min-height:440px;display:grid;place-content:center;text-align:center;gap:10px;color:#9db0ba}.chart-loading strong{color:#77e4d0}.chart-loading[data-error="true"] strong{color:#ff8f8a}#chart{width:100%;height:100%;min-height:440px}
+    </style>
+  </head>
+  <body>
+    <div id="chart-loading" class="chart-loading"><strong>يتم تهيئة مساحة العرض الخارجية</strong><span>هذه البيانات لا تدخل محركات القرار أو إدارة المخاطر.</span></div>
+    <div id="chart" hidden></div>
+    <script>
+      (() => {
+        const allowedSymbols = new Set(["OANDA:XAUUSD", "COMEX:GC1!", "FX:EURUSD", "TVC:SPX", "NASDAQ:AAPL", "COINBASE:BTCUSD"]);
+        const allowedIntervals = new Set(["1", "5", "15", "30", "60", "240", "D"]);
+        const hash = window.location.hash.slice(1);
+        const parameters = new URLSearchParams(hash);
+        const legacySymbol = decodeURIComponent(hash);
+        const requestedSymbol = parameters.get("symbol") || legacySymbol;
+        const requestedInterval = parameters.get("interval") || "15";
+        const symbol = allowedSymbols.has(requestedSymbol) ? requestedSymbol : "OANDA:XAUUSD";
+        const interval = allowedIntervals.has(requestedInterval) ? requestedInterval : "15";
+        const loading = document.querySelector("#chart-loading");
+        const target = document.querySelector("#chart");
+        const fail = () => {
+          loading.dataset.error = "true";
+          loading.innerHTML = "<strong>تعذر تحميل مصدر الرسم الخارجي.</strong><span>تحقق من اتصالك وسياسة المصدر؛ لا يؤثر ذلك في وضع التحليل المحلي.</span>";
+        };
+        const script = document.createElement("script");
+        script.src = "https://s3.tradingview.com/tv.js";
+        script.async = true;
+        script.onerror = fail;
+        script.onload = () => {
+          if (!window.TradingView) { fail(); return; }
+          loading.hidden = true;
+          target.hidden = false;
+          new window.TradingView.widget({
+            container_id: "chart", autosize: true, symbol, interval, timezone: "Etc/UTC",
+            theme: "dark", style: "1", locale: "ar", toolbar_bg: "#09131f", enable_publishing: false,
+            hide_legend: false, allow_symbol_change: false, calendar: true, support_host: "https://www.tradingview.com"
+          });
+        };
+        document.head.appendChild(script);
+      })();
+    </script>
+  </body>
+</html>
