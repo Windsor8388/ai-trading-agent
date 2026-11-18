@@ -14,3 +14,14 @@ __pycache__/
 *.mov
 *.webm
 *.mkv
+
+# Locally supplied market data, research runs, and reproducibility ledgers may be
+# licensed or large. Keep manifests/configuration in Git, not the raw payloads.
+data/
+artifacts/
+runs/
+*.parquet
+*.feather
+*.arrow
+*.sqlite
+*.sqlite3

@@ -180,6 +180,9 @@ class PortfolioState:
     drawdown_fraction: float = 0.0
     open_positions: int = 0
     correlated_open_positions: int = 0
+    consecutive_losses: int = 0
+    gross_exposure_fraction: float = 0.0
+    event_risk_active: bool = False
 
 
 @dataclass(frozen=True, slots=True)
@@ -190,6 +193,9 @@ class RiskLimits:
     max_drawdown_fraction: float = 0.10
     max_open_positions: int = 3
     max_correlated_positions: int = 1
+    min_reward_to_risk: float = 1.0
+    max_consecutive_losses: int = 3
+    max_gross_exposure_fraction: float = 1.0
 
 
 @dataclass(frozen=True, slots=True)

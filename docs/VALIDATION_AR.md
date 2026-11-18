@@ -8,7 +8,7 @@
 PYTHONPATH=src python -m unittest discover -s tests -v
 ```
 
-الحالات الحالية (14 اختباراً):
+الحالات الحالية (24 اختباراً):
 
 - رفض `future/unclosed` bar لمنع look-ahead.
 - رفض ICT evidence على بيانات غير صالحة.
@@ -20,8 +20,15 @@ PYTHONPATH=src python -m unittest discover -s tests -v
 - منع `TradeSignal` في `ANALYSIS_ONLY` حتى مع decision/risk صالحين.
 - metrics بلا profit factor مصطنع، temporal walk-forward، وMonte Carlo قابل للإعادة بالبذرة.
 - صلاحية مراجع source/relations في قاعدة المعرفة، وتماثل نسختها المرفقة بالحزمة مع السجل canonical.
+- استيراد CSV مع SHA-256 وتحويل timezone إلى UTC، وتجميع intraday لا يملأ bucket غير مكتمل.
+- replay history يثبت أن الإشارة لا ترى المستقبل وتدخل عند next-open فقط.
+- بار يلمس stop وtarget يعامل `STOP_FIRST_AMBIGUOUS`، وليس المسار الرابح المفترض.
+- محرك backtest يرفض metadata لوصف live feed؛ replay مقصور على historical/synthetic.
+- سلسلة Ledger hash-chain سليمة وتكتشف تعديل payload.
+- Paper simulator يثبت idempotency وkill switch وexit الورقي المحافظ.
+- circuit breakers لمتتاليات الخسارة وevent-risk embargo.
 
-هذه اختبارات سلوك برنامج، **وليست Backtest ولا إثبات ربحية**.
+هذه اختبارات سلوك برنامج وfixture اصطناعية، **وليست Backtest على السوق ولا إثبات ربحية**.
 
 ## مصفوفة قبول لكل مكوّن
 

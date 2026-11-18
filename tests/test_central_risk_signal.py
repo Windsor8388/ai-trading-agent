@@ -53,6 +53,16 @@ class CentralRiskSignalTests(unittest.TestCase):
         self.assertFalse(result.approved)
         self.assertIn("Daily loss limit", result.reasons[0])
 
+    def test_risk_circuit_breakers_cover_revenge_and_event_risk(self) -> None:
+        levels = ProposedLevels(100, 99, (102,), "unit")
+        result = RiskManagementEngine().assess(
+            DecisionAction.BUY, levels, PortfolioState(10_000, consecutive_losses=3, event_risk_active=True),
+            InstrumentRiskSpec("XAUUSD", 100, .01, .01),
+        )
+        self.assertFalse(result.approved)
+        self.assertTrue(any("Consecutive-loss" in reason for reason in result.reasons))
+        self.assertTrue(any("event-risk" in reason for reason in result.reasons))
+
     def test_analysis_only_never_issues_trade_signal(self) -> None:
         decision = CentralTradingIntelligenceEngine().decide([
             report("quant", evidence("quant", "statistical_trend", .7)),

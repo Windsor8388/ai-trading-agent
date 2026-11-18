@@ -31,6 +31,8 @@ class RiskManagementEngine:
         if reward <= 0:
             return RiskAssessment(False, None, None, ("First target is not on the reward side of entry.",))
         reward_to_risk = reward / stop_distance
+        if reward_to_risk < self.limits.min_reward_to_risk:
+            reasons.append(f"Reward/risk {reward_to_risk:.2f} is below the configured minimum {self.limits.min_reward_to_risk:.2f}.")
         if portfolio.realized_daily_loss >= portfolio.equity * self.limits.daily_loss_fraction:
             reasons.append("Daily loss limit reached; trading is stopped.")
         if portfolio.realized_weekly_loss >= portfolio.equity * self.limits.weekly_loss_fraction:
@@ -41,6 +43,12 @@ class RiskManagementEngine:
             reasons.append("Maximum open-position count reached.")
         if portfolio.correlated_open_positions >= self.limits.max_correlated_positions:
             reasons.append("Correlated-position limit reached.")
+        if portfolio.consecutive_losses >= self.limits.max_consecutive_losses:
+            reasons.append("Consecutive-loss circuit breaker reached; trading is stopped.")
+        if portfolio.gross_exposure_fraction >= self.limits.max_gross_exposure_fraction:
+            reasons.append("Gross-exposure limit reached.")
+        if portfolio.event_risk_active:
+            reasons.append("Configured event-risk embargo is active; new entries are blocked.")
         if reasons:
             return RiskAssessment(False, None, None, tuple(reasons))
         cash_risk = portfolio.equity * self.limits.risk_per_trade_fraction

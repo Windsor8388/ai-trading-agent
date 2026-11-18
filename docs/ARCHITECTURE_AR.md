@@ -124,6 +124,10 @@ NormalizedBar
 | `Decision` | `models.py` | action، أدلة مختارة ومرفوضة لارتباطها، أسباب/invalidation |
 | `RiskAssessment` | `models.py` | approval، quantity، cash risk، reward/risk، أسباب |
 | `TradeSignal` | `models.py` | signal candidate ممهور بالمصدر والمخاطر والحالة؛ ليس order |
+| `DatasetManifest` | `providers/csv_ohlcv.py` | SHA-256 ومصدر CSV/parser/quality والـfeed lineage |
+| `BacktestResult` | `backtest/engine.py` | trades، equity curve، costs، أسباب الخروج وملخص منفصل للـtrade/bar |
+| `ResearchLedger` | `research/ledger.py` | JSONL hash-chain للتنبؤ/التجربة قبل ظهور النتيجة |
+| `PaperExecutionSimulator` | `paper.py` | محاكاة محلية idempotent/kill-switch وليست venue |
 
 ### عقود واجهات المرحلة التالية
 
@@ -198,7 +202,7 @@ src/trading_intelligence/
     indicators.py               # transparent no-lookahead primitives
     technical.py                # first independent engines
   research/metrics.py           # metrics, bootstrap, temporal folds
-tests/                          # 14 local deterministic tests (current)
+tests/                          # 24 local deterministic tests (current)
 docs/
   TRADING_INTELLIGENCE_RESEARCH_AR.md
   DATA_SOURCES_AR.md
@@ -214,11 +218,11 @@ docs/
 | 1. المعرفة والبحث | registry + concepts + policy | مراجعة مصدر/إصدار لكل rule، وفصل definition عن evidence |
 | 2. محركات المدارس | detectors مستقلة وfixtures | unit/replay tests وconcept mapping لكل output |
 | 3. العقل المركزي | calibration/de-correlation/regime | ablation وcorrelation analysis على OOS فقط |
-| 4. البيانات | adapter واحد read-only + raw lineage | QA، timestamps، gaps، spot/GC identity، reconciliation مع vendor |
+| 4. البيانات | CSV historical importer + hash manifest + resampling محافظ **(منفذ محلياً)**؛ provider API read-only لاحقاً | QA، timestamps، gaps، spot/GC identity، reconciliation مع vendor |
 | 5. signals | levels/expiry/cancel conditions | لا signal عند stale/unverified/missing inputs |
-| 6. risk | portfolio/exposure/news correlation | property tests وlimits في حالات فشل متعددة |
-| 7. backtest | event-driven fills/cost/roll model | benchmark known fixtures + no-lookahead audits |
-| 8. paper | append-only predictions/fills | reconciliation وفترة forward precommitted |
+| 6. risk | portfolio/exposure/news correlation **(limits وevent/circuit breakers منفذة؛ لا calendar feed بعد)** | property tests وlimits في حالات فشل متعددة |
+| 7. backtest | event-driven next-open fills/cost/stop-first replay **(منفذ محلياً)**؛ roll/tick model لاحقاً | benchmark known fixtures + no-lookahead audits |
+| 8. paper | append-only hash ledger + in-memory idempotent paper simulator **(منفذ محلياً)** | reconciliation وفترة forward precommitted |
 | 9. improvement | locked experiment registry + model gates | final OOS untouched + drift monitoring |
 | 10. live study | venue adapter + human approval | disaster drills, security review, explicit user approval؛ لا auto-go-live |
 

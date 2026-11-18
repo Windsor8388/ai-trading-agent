@@ -59,3 +59,40 @@ def timeframe_seconds(timeframe: str) -> int:
         return values[timeframe]
     except KeyError as exc:
         raise ValueError(f"Unsupported canonical timeframe: {timeframe}") from exc
+
+
+def resample_intraday_bars(candles: Sequence[Candle], source_timeframe: str, target_timeframe: str) -> tuple[Candle, ...]:
+    """Aggregate complete, contiguous intraday bars without filling gaps.
+
+    This deliberately supports only minute/hour timeframes aligned to UTC epoch. Daily,
+    weekly, and monthly candles require an explicit venue/session alignment policy and
+    must be built by the provider adapter rather than guessed here.
+    """
+    source_seconds = timeframe_seconds(source_timeframe)
+    target_seconds = timeframe_seconds(target_timeframe)
+    if source_timeframe in {"D1", "W1", "MN"} or target_timeframe in {"D1", "W1", "MN"}:
+        raise ValueError("Daily/weekly/monthly resampling requires a provider session-alignment policy.")
+    if target_seconds <= source_seconds or target_seconds % source_seconds:
+        raise ValueError("Target timeframe must be an integer multiple of a smaller source timeframe.")
+    if not candles:
+        return ()
+    quality = validate_closed_candles(candles, candles[-1].close_time)
+    if not quality.passed:
+        raise ValueError(f"Cannot resample invalid bars: {'; '.join(quality.errors)}")
+    expected = target_seconds // source_seconds
+    grouped: dict[int, list[Candle]] = {}
+    for candle in candles:
+        bucket = int(candle.open_time.timestamp()) // target_seconds
+        grouped.setdefault(bucket, []).append(candle)
+    result: list[Candle] = []
+    for bucket in sorted(grouped):
+        group = grouped[bucket]
+        # Missing source bars invalidate this aggregate rather than creating a synthetic candle.
+        contiguous = all(current.open_time == prior.close_time for prior, current in zip(group, group[1:]))
+        aligned = int(group[0].open_time.timestamp()) % target_seconds == 0
+        if len(group) != expected or not contiguous or not aligned:
+            continue
+        volumes = [bar.volume for bar in group]
+        volume = sum(value for value in volumes if value is not None) if all(value is not None for value in volumes) else None
+        result.append(Candle(group[0].open_time, group[-1].close_time, group[0].open, max(bar.high for bar in group), min(bar.low for bar in group), group[-1].close, volume))
+    return tuple(result)

@@ -151,14 +151,17 @@ ICT وSMC وPrice Action تصف غالباً نفس السلسلة السعري�
 
 لا توجد حدود رقمية "سحرية" عامة لـPF أو Sharpe. تُحدد عتبات قبول مسبقاً بحسب الأداة، horizon، turnover والتكاليف، مع مقارنة إلزامية ضد baseline بسيط و`NO_TRADE`/cash.
 
-## 7) ما تم بناؤه فعلاً في الإصدار الأول
+## 7) ما تم بناؤه فعلاً حتى الإصدار 0.2
 
-- قاعدة معرفة JSON ذات مصدر وإصدار وتاريخ وعلاقات: `knowledge/`.
+- قاعدة معرفة JSON ذات مصدر وإصدار وتاريخ وعلاقات، مع قارئ يتحقق من source/relation integrity: `knowledge/` و`knowledge.py`.
 - objects صارمة للشموع وlineage وevidence/engine report/decision/signal/risk.
-- validator يرفض future/unclosed/duplicate/out-of-order bars.
+- validator يرفض future/unclosed/duplicate/out-of-order bars، وresampler intraday لا يملأ فجوة أو يبني daily/weekly بلا session policy.
+- CSV importer تاريخي read-only يحوّل timestamps إلى UTC، يرفض الصف السيئ، ويخرج SHA-256 manifest؛ **لم يستورد أي بيانات حقيقية ضمن هذا المشروع**.
 - محركات مستقلة: `price_action`, `ict`, `smc`, `volume`, `quantitative` ومحرك عدم-توفر للـorder flow/news.
 - عقل مركزي يزيل تكرار evidence correlation ويعيد `NO_TRADE` عند ضعف الدرجة أو قلة المجموعات المستقلة أو تعارض HTF.
-- risk gate لا يستنتج حجم عقد XAU/USD، يمنع limits اليومية/الأسبوعية/DD/ارتباط الصفقات.
+- risk gate لا يستنتج حجم عقد XAU/USD، ويحمي limits اليومية/الأسبوعية/DD/الارتباط وRR ومتتاليات الخسارة وevent-risk embargo.
+- event-driven historical replay: signal-after-close/next-open، costs، stop-first في bar الغامض، equity curve وtrade metrics؛ لم يشغّل Backtest حقيقياً.
+- `ResearchLedger` hash-chained لتسجيل الفرضية/التنبؤ قبل outcome، و`PaperExecutionSimulator` محلي idempotent مع kill switch، بلا شبكة أو وسيط.
 - metrics وwalk-forward splits وbootstrap، مع اختبارات وحدات محلية.
 
-**غير منفذ عمداً:** موصل بيانات، تاريخ حقيقي، Volume/Market Profile، order-flow حقيقي، Wyckoff/fundamental/NLP/ML، simulator fills كامل، dashboard، paper broker، وlive execution. التفاصيل المعمارية وخطة التنفيذ في [`ARCHITECTURE_AR.md`](ARCHITECTURE_AR.md) و[`DATA_SOURCES_AR.md`](DATA_SOURCES_AR.md).
+**غير منفذ عمداً:** موصل API فعلي أو live/historical feed متصل، تاريخ حقيقي تم اختباره، Volume/Market Profile، order-flow حقيقي، Wyckoff/fundamental/NLP/ML، tick/partial-fill/market-impact/roll simulator كامل، dashboard، persistence/reconciliation للخدمات، وlive execution. التفاصيل في [`ARCHITECTURE_AR.md`](ARCHITECTURE_AR.md)، [`DATA_SOURCES_AR.md`](DATA_SOURCES_AR.md)، و[`BACKTEST_AND_PAPER_AR.md`](BACKTEST_AND_PAPER_AR.md).

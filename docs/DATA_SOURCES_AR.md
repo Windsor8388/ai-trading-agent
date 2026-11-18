@@ -118,3 +118,9 @@ flowchart TD
 - [ ] حجم وcontract multiplier لا يفترضان من الرمز.
 - [ ] acceptance replay وreconciliation نجحا.
 - [ ] لا تفعيل signal أو paper حتى `live_feed_verified` وquality status مناسبين.
+
+## 8) ما نُفذ محلياً: CSV historical ingress
+
+أضيف `providers/csv_ohlcv.py` كجسر آمن لملف تاريخي يقدمه المستخدم أو مزود مرخّص. هو **ليس API ولا اتصالاً بالسوق**. يفرض CSV ISO-8601 + OHLC (+ volume اختياري)، يحول الوقت إلى UTC، يرفض أي صف معيب أو duplicate/out-of-order، ويُنتج `DatasetManifest` فيه SHA-256 للملف وparser version وquality report و`FeedMetadata` بنمط `HISTORICAL`.
+
+يوجد أيضاً `resample_intraday_bars`، لكنه لا يملأ bars مفقودة ولا ينشئ D1/W1/MN، لأن تلك تحتاج daily alignment/session policy من المزود. تفاصيل replay واستخدام الملف في experiment موجودة في [`BACKTEST_AND_PAPER_AR.md`](BACKTEST_AND_PAPER_AR.md).
