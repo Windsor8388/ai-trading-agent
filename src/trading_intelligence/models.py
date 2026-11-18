@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timedelta
 from enum import Enum
 from typing import Mapping, Sequence
 
@@ -50,6 +50,8 @@ class Candle:
     def __post_init__(self) -> None:
         if self.open_time.tzinfo is None or self.close_time.tzinfo is None:
             raise ValueError("Candle timestamps must be timezone-aware.")
+        if self.open_time.utcoffset() != timedelta(0) or self.close_time.utcoffset() != timedelta(0):
+            raise ValueError("Candle timestamps must be normalized to UTC.")
         if self.close_time <= self.open_time:
             raise ValueError("Candle close_time must be after open_time.")
         if self.low > min(self.open, self.close) or self.high < max(self.open, self.close):
@@ -76,6 +78,12 @@ class FeedMetadata:
     quality_status: str = "UNVERIFIED"
     notes: str = ""
 
+    def __post_init__(self) -> None:
+        if not self.provider or not self.instrument or not self.instrument_kind or not self.price_component:
+            raise ValueError("Feed metadata requires provider, instrument, kind, and price component.")
+        if self.retrieved_at.tzinfo is None or self.retrieved_at.utcoffset() != timedelta(0):
+            raise ValueError("Feed metadata retrieved_at must be timezone-aware UTC.")
+
 
 @dataclass(frozen=True, slots=True)
 class MarketSnapshot:
@@ -90,6 +98,12 @@ class MarketSnapshot:
     candles_by_timeframe: Mapping[str, Sequence[Candle]]
     economic_events: Sequence[Mapping[str, object]] = field(default_factory=tuple)
     order_flow_available: bool = False
+
+    def __post_init__(self) -> None:
+        if self.as_of.tzinfo is None or self.as_of.utcoffset() != timedelta(0):
+            raise ValueError("Market snapshot as_of must be timezone-aware UTC.")
+        if self.feed.instrument == "":
+            raise ValueError("Market snapshot feed requires an instrument.")
 
     def candles(self, timeframe: str) -> Sequence[Candle]:
         return self.candles_by_timeframe.get(timeframe, ())

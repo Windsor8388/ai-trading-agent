@@ -142,3 +142,18 @@ flowchart TD
 | dashboard hosting | لوحة static منشورة على Vercel | CSP، relative URLs، no client secrets، وحد عرض خارجي opt-in | لا backend/API أو provider integration في الواجهة |
 
 مراجع OANDA وCME الموجودة في [`knowledge/sources.json`](../knowledge/sources.json) تثبت شكل product/API المعروض في وثائقها فقط. لا تثبت ملاءمة مصدر بعينه، تسعيره، ترخيصه، توفره في منطقة المستخدم، أو وجود بيانات حية.
+
+## 10) ما أُكمل في quality-gated pipeline
+
+`MarketDataPipeline` الآن يحتفظ بـraw response داخل `IngestionReceipt` وبنسخة normalized منفصلة لكل
+`provider/instrument/timeframe/price_component` بعد القبول فقط:
+
+- يعامل replay متطابقاً لنفس `open_time` كـ`EXACT_REPLAY` مسجل ولا يضيف bar مكرراً.
+- يعامل نفس الهوية/الوقت مع OHLCV مختلف كـ`CONFLICTING_REVISION` ويُحجره افتراضياً؛ لا overwrite صامت.
+- يستطيع `DataPipelinePolicy.max_live_staleness` حظر feed ذات `DataMode.LIVE` عند تجاوز watermark؛ لا يعيد استعمال السعر القديم كأنه حي.
+- `build_snapshot()` يرفض بناء `MarketSnapshot` ما لم تتوفر receipts مقبولة لكل timeframe مطلوب وبهوية provider/vendor/mode متسقة.
+- كل `Candle` و`FeedMetadata.retrieved_at` و`MarketSnapshot.as_of` يجب أن تكون UTC صراحة، لا timezone-aware فقط.
+
+هذه الحماية لا تنشئ اتصالاً ولا تخزن raw payload طويل الأجل. التخزين الدائم، encryption، retention وRBAC/audit الخارجي ما زالت بنية خدمة مطلوبة قبل Forward Paper.
+
+راجع أيضاً [`INSTRUMENT_UNIVERSE_AR.md`](INSTRUMENT_UNIVERSE_AR.md) لخريطة XAU/USD وFX والمؤشرات والأسهم والعملات الرقمية وهوية GC المنفصلة.

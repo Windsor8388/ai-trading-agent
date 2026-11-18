@@ -35,7 +35,7 @@
     <main id="main" class="shell">
       <section class="hero" aria-labelledby="hero-heading">
         <div class="hero-copy">
-          <p class="eyebrow">SYSTEM CONTROL ROOM · V0.7</p>
+          <p class="eyebrow">SYSTEM CONTROL ROOM · V0.8</p>
           <h2 id="hero-heading">عقل بحثي متعدد المدارس،<br /><em>لا يتداول قبل أن يثبت.</em></h2>
           <p class="hero-text">منصة بحث وتحليل قابلة للتدقيق تجمع مدارس السوق، تفصل الأدلة المترابطة، وتضع حماية رأس المال فوق أي إشارة. هذه الواجهة تعرض حالة النموذج الأولي المحلي فقط — لا يوجد مزود أسعار حي أو وسيط متصل.</p>
           <div class="hero-actions">
@@ -73,7 +73,7 @@
             <div class="workspace-card-head"><div><span class="small-label">WORKSPACE CONTEXT</span><h3>اختيار العرض لا يعني اتصالاً بالبيانات</h3></div><span class="local-badge">محلي</span></div>
             <p>اضبط الأداة والإطار لواجهة العرض فقط. لا تتغير المحركات أو المخاطر أو القرار بهذه العناصر قبل وجود data snapshot موثق.</p>
             <div class="workspace-fields">
-              <label class="field-label" for="workspace-instrument">الأداة المعروضة<select id="workspace-instrument" class="chart-select"><option value="OANDA:XAUUSD">XAU/USD · Spot</option><option value="COMEX:GC1!">GC · Futures continuous</option><option value="FX:EURUSD">EUR/USD · مثال</option></select></label>
+              <label class="field-label" for="workspace-instrument">الأداة المعروضة<select id="workspace-instrument" class="chart-select"><option value="OANDA:XAUUSD">XAU/USD · Spot</option><option value="COMEX:GC1!">GC · Futures continuous</option><option value="FX:EURUSD">EUR/USD · Spot</option><option value="TVC:SPX">US500 · Cash index</option><option value="NASDAQ:AAPL">AAPL · Equity</option><option value="COINBASE:BTCUSD">BTC/USD · Crypto spot</option></select></label>
               <div><span class="field-label" id="workspace-timeframe-label">الإطار المعروض</span><div class="timeframe-picker" role="group" aria-labelledby="workspace-timeframe-label"><button type="button" class="timeframe-chip" data-timeframe="1">M1</button><button type="button" class="timeframe-chip" data-timeframe="5">M5</button><button type="button" class="timeframe-chip active" data-timeframe="15">M15</button><button type="button" class="timeframe-chip" data-timeframe="30">M30</button><button type="button" class="timeframe-chip" data-timeframe="60">H1</button><button type="button" class="timeframe-chip" data-timeframe="240">H4</button><button type="button" class="timeframe-chip" data-timeframe="D">D1</button></div></div>
             </div>
             <div class="workspace-actions"><button class="primary-button" id="open-chart-workspace" type="button">عرض الرسم الخارجي <span>←</span></button><button class="ghost-button" id="copy-system-summary" type="button">نسخ ملخص الحالة</button></div>
@@ -84,12 +84,12 @@
             <div class="watchlist" role="list">
               <button type="button" class="watchlist-item active" data-symbol="OANDA:XAUUSD" role="listitem"><span><b>XAU/USD</b><small>Spot · يحتاج source contract</small></span><i>↗</i></button>
               <button type="button" class="watchlist-item" data-symbol="COMEX:GC1!" role="listitem"><span><b>GC</b><small>Futures · منفصل عن XAU/USD</small></span><i>↗</i></button>
-              <button type="button" class="watchlist-item" data-symbol="FX:EURUSD" role="listitem"><span><b>EUR/USD</b><small>مثال visualization خارجي</small></span><i>↗</i></button>
+              <button type="button" class="watchlist-item" data-symbol="FX:EURUSD" role="listitem"><span><b>EUR/USD</b><small>FX · visualization خارجي</small></span><i>↗</i></button><button type="button" class="watchlist-item" data-symbol="TVC:SPX" role="listitem"><span><b>US500</b><small>Index · عقد مزود مطلوب</small></span><i>↗</i></button><button type="button" class="watchlist-item" data-symbol="NASDAQ:AAPL" role="listitem"><span><b>AAPL</b><small>Equity · calendar/adjustments</small></span><i>↗</i></button><button type="button" class="watchlist-item" data-symbol="COINBASE:BTCUSD" role="listitem"><span><b>BTC/USD</b><small>Crypto · venue-specific</small></span><i>↗</i></button>
             </div>
           </aside>
           <aside class="workspace-card rails-card" aria-labelledby="rails-heading">
             <div class="workspace-card-head"><div><span class="small-label">SYSTEM RAILS</span><h3 id="rails-heading">حالة التكاملات</h3></div></div>
-            <ul class="rail-list"><li><span class="rail-dot ready"></span><div><b>Engine catalog</b><small>محلي · 17 قدرة موثقة</small></div></li><li><span class="rail-dot ready"></span><div><b>Risk &amp; audit</b><small>محلي · policy-gated</small></div></li><li><span class="rail-dot idle"></span><div><b>Market data API</b><small>adapter جاهز · غير مهيأ</small></div></li><li><span class="rail-dot idle"></span><div><b>Calendar / news</b><small>data contract فقط</small></div></li></ul>
+            <ul class="rail-list"><li><span class="rail-dot ready"></span><div><b>Engine catalog</b><small>محلي · 18 قدرة موثقة</small></div></li><li><span class="rail-dot ready"></span><div><b>Risk &amp; audit</b><small>محلي · policy-gated</small></div></li><li><span class="rail-dot idle"></span><div><b>Market data API</b><small>adapter جاهز · غير مهيأ</small></div></li><li><span class="rail-dot idle"></span><div><b>Calendar / news</b><small>data contract فقط</small></div></li></ul>
           </aside>
         </div>
       </section>
@@ -191,7 +191,7 @@
               <li>لا حساب، لا API key، ولا إرسال أمر.</li>
               <li>افحص الترخيص والتأخير والمصدر قبل أي استخدام بحثي.</li>
             </ul>
-            <div class="chart-controls-grid"><label class="field-label" for="chart-symbol">رمز العرض الخارجي<select id="chart-symbol" class="chart-select"><option value="OANDA:XAUUSD">XAU/USD · OANDA</option><option value="COMEX:GC1!">GC continuous · COMEX</option><option value="FX:EURUSD">EUR/USD · مثال الملف المرفق</option></select></label><label class="field-label" for="chart-interval">إطار الرسم الخارجي<select id="chart-interval" class="chart-select"><option value="1">M1</option><option value="5">M5</option><option value="15" selected>M15</option><option value="30">M30</option><option value="60">H1</option><option value="240">H4</option><option value="D">D1</option></select></label></div>
+            <div class="chart-controls-grid"><label class="field-label" for="chart-symbol">رمز العرض الخارجي<select id="chart-symbol" class="chart-select"><option value="OANDA:XAUUSD">XAU/USD · OANDA</option><option value="COMEX:GC1!">GC continuous · COMEX</option><option value="FX:EURUSD">EUR/USD · Spot</option><option value="TVC:SPX">US500 · Cash index</option><option value="NASDAQ:AAPL">AAPL · Equity</option><option value="COINBASE:BTCUSD">BTC/USD · Crypto spot</option></select></label><label class="field-label" for="chart-interval">إطار الرسم الخارجي<select id="chart-interval" class="chart-select"><option value="1">M1</option><option value="5">M5</option><option value="15" selected>M15</option><option value="30">M30</option><option value="60">H1</option><option value="240">H4</option><option value="D">D1</option></select></label></div>
             <div class="chart-actions"><button class="primary-button" id="load-chart" type="button">تحميل الرسم الخارجي <span>←</span></button><button class="ghost-button" id="unload-chart" type="button" disabled>إزالة الرسم</button></div>
             <p id="chart-status" class="chart-status" role="status" aria-live="polite">لم يُحمّل أي مصدر خارجي بعد.</p>
           </article>

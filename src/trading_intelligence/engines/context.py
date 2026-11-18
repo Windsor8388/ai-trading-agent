@@ -69,6 +69,64 @@ class StructureEventEngine(AnalysisEngine):
 
 
 @dataclass(frozen=True, slots=True)
+class LiquidityProxyEngine(AnalysisEngine):
+    """Equal-high/low sweep proxy; never claims visibility into resting liquidity."""
+
+    name: str = "liquidity"
+    version: str = "0.1.0"
+    equal_level_atr_fraction: float = 0.15
+
+    def analyze(self, snapshot: MarketSnapshot, timeframe: str) -> EngineReport:
+        candles = _valid(self, snapshot, timeframe, 20)
+        if candles is None:
+            return _empty(self, snapshot, timeframe, "Need >= 20 valid completed bars for an equal-level liquidity proxy.")
+        average_range = atr(candles)
+        if average_range is None or average_range <= 0:
+            return _empty(self, snapshot, timeframe, "ATR is unavailable; equal-level tolerance is undefined.")
+        tolerance = average_range * self.equal_level_atr_fraction
+        pivots = confirmed_pivots(candles)
+        candidates: list[tuple[str, float, float, float]] = []
+        last = candles[-1]
+        for kind, direction in (("HIGH", -1.0), ("LOW", 1.0)):
+            points = [pivot for pivot in pivots if pivot.kind == kind]
+            if len(points) < 2:
+                continue
+            prior, latest = points[-2:]
+            if abs(prior.price - latest.price) > tolerance:
+                continue
+            pool = (prior.price + latest.price) / 2
+            if kind == "HIGH" and last.high > pool + tolerance and last.close < pool:
+                candidates.append(("EQUAL_HIGH_SWEEP", direction, pool, last.high))
+            elif kind == "LOW" and last.low < pool - tolerance and last.close > pool:
+                candidates.append(("EQUAL_LOW_SWEEP", direction, pool, last.low))
+        if not candidates:
+            return EngineReport(
+                self.name, self.version, timeframe, snapshot.as_of, Direction.FLAT, 0.1, MarketRegime.UNKNOWN,
+                observations=("No completed equal-high/low sweep proxy; actual resting liquidity requires synchronized L2/order-book data.",),
+                required_inputs_missing=("L2/order-book data for actual resting-liquidity measurement",),
+            )
+        event, score, pool, extreme = max(candidates, key=lambda item: abs(item[1]))
+        evidence = Evidence(
+            f"LIQUIDITY-{event}-{timeframe}", self.name, timeframe, score, 0.45, "market_structure",
+            f"event={event}; proxy_pool={pool:.8g}; last_extreme={extreme:.8g}; tolerance={tolerance:.8g}; close={last.close:.8g}",
+            "Completed-bar equal-level sweep proxy. It is not a measurement of displayed or resting venue liquidity.",
+            "liquidity.stop_cluster_proxy",
+        )
+        invalidation = (
+            f"Close back above equal-high proxy pool {pool:.8g} invalidates bearish sweep premise.",
+        ) if score < 0 else (
+            f"Close back below equal-low proxy pool {pool:.8g} invalidates bullish sweep premise.",
+        )
+        return EngineReport(
+            self.name, self.version, timeframe, snapshot.as_of,
+            Direction.BUY if score > 0 else Direction.SELL, evidence.confidence, MarketRegime.UNKNOWN,
+            evidence=(evidence,), invalidation_conditions=invalidation,
+            observations=("OHLC proxy only; use L2/order-book feed for actual liquidity assertions.",),
+            required_inputs_missing=("L2/order-book data for actual resting-liquidity measurement",),
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class SupportResistanceEngine(AnalysisEngine):
     """Pivot-touch support/resistance hypothesis; it does not manufacture horizontal levels."""
 

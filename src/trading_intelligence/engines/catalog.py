@@ -9,10 +9,12 @@ from .advanced import (
     FibonacciAnalysisEngine,
     FundamentalEventEngine,
     MarketProfileAvailabilityEngine,
+    ResearchBacklogEngine,
     WyckoffAnalysisEngine,
 )
 from .base import AnalysisEngine
 from .context import (
+    LiquidityProxyEngine,
     SessionContextEngine,
     StructureEventEngine,
     SupplyDemandEngine,
@@ -50,6 +52,7 @@ ENGINE_CATALOG: tuple[EngineDescriptor, ...] = (
     EngineDescriptor("classical_patterns", "Classical Technical Analysis", ("classical.chart_pattern",), ("versioned geometric template", "breakout/cost policy"), EngineAvailability.TEMPLATE_REQUIRED, "No chart pattern is labelled until a frozen geometry policy exists."),
     EngineDescriptor("fibonacci", "Fibonacci", ("fibonacci.retracement", "ict.ote"), ("closed OHLC", "confirmed opposite pivots", "ATR"), EngineAvailability.IMPLEMENTED, "Fixed-ratio feature hypothesis only."),
     EngineDescriptor("liquidity", "Liquidity Trading", ("liquidity.stop_cluster_proxy",), ("closed OHLC or L2"), EngineAvailability.IMPLEMENTED, "OHLC equal-high/low is only a liquidity proxy; actual resting liquidity needs L2."),
+    EngineDescriptor("session_context", "Market Context", ("market_context.session_utc",), ("closed OHLC", "UTC-normalized timestamp", "session policy"), EngineAvailability.IMPLEMENTED, "Generic UTC label only; exchange, broker, holiday, and DST policies require product-specific configuration."),
     EngineDescriptor("volume", "Volume", ("volume.relative_volume",), ("OHLCV with documented semantics"), EngineAvailability.IMPLEMENTED, "Relative volume only; no profile inference."),
     EngineDescriptor("volume_profile", "Volume Profile", ("volume_profile.poc",), ("venue volume-at-price or trade prints"), EngineAvailability.DATA_REQUIRED, "VAP/TPO/POC is explicitly unavailable from ordinary OHLCV."),
     EngineDescriptor("market_profile", "Market Profile", ("market_profile.auction",), ("session-aware TPO or volume-at-price"), EngineAvailability.DATA_REQUIRED, "No auction profile is inferred without session-aware distribution."),
@@ -70,7 +73,11 @@ def default_research_engines() -> tuple[AnalysisEngine, ...]:
     return (
         ICTAnalysisEngine(), SMCAnalysisEngine(), PriceActionEngine(), StructureEventEngine(), WyckoffAnalysisEngine(),
         SupplyDemandEngine(), SupportResistanceEngine(), ClassicalPatternAvailabilityEngine(), FibonacciAnalysisEngine(),
-        QuantitativeAnalysisEngine(), VolumeAnalysisEngine(), VolumeProfileAvailabilityEngine(), MarketProfileAvailabilityEngine(),
+        LiquidityProxyEngine(), SessionContextEngine(), QuantitativeAnalysisEngine(), VolumeAnalysisEngine(),
+        VolumeProfileAvailabilityEngine(), MarketProfileAvailabilityEngine(),
         UnavailableInputEngine(required_input="tick trades plus quotes/L2 for order flow, delta, CVD, and footprint", name="order_flow"),
-        FundamentalEventEngine(), SessionContextEngine(),
+        FundamentalEventEngine(), ResearchBacklogEngine(
+            required_input="point-in-time features, locked temporal OOS evaluation, and a baseline-comparison approval",
+            limitation="No trained ML model or validated OOS lift has been registered.", name="ml",
+        ),
     )

@@ -159,6 +159,23 @@ class FundamentalEventEngine(AnalysisEngine):
 
 
 @dataclass(frozen=True, slots=True)
+class ResearchBacklogEngine(AnalysisEngine):
+    """Explicit report for a school whose model/data validation has not been approved."""
+
+    required_input: str = ""
+    limitation: str = ""
+    name: str = "research_backlog"
+    version: str = "0.1.0"
+
+    def analyze(self, snapshot: MarketSnapshot, timeframe: str) -> EngineReport:
+        return _empty(
+            self, snapshot, timeframe,
+            f"{self.name} is not enabled: {self.limitation}",
+            missing=(self.required_input,),
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class MarketProfileAvailabilityEngine(AnalysisEngine):
     """Prevents an OHLC-only approximation being mislabeled as TPO/auction profile."""
 

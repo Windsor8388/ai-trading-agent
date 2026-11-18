@@ -19,6 +19,7 @@
 | Supply/Demand | last-opposite-candle قبل displacement | OHLC، ATR | zone proxy وليس volume/order-book demand |
 | S/R | clustering لـconfirmed pivots | OHLC، pivots، ATR | لا رسم بصري أو مستوى غير قابل لإعادة الإنتاج |
 | Fibonacci | قرب retracement لنطاق ratios ثابت | opposite confirmed pivots، ATR | feature hypothesis؛ ratio ليس سبباً مثبتاً |
+| Liquidity | equal-high/low sweep proxy مستقل | OHLC مغلق، ATR؛ L2 للقياس الحقيقي | لا يزعم رؤية resting liquidity؛ يبقى ضمن correlation group structure |
 | Quant | SMA20/50 + volatility gate | OHLC مغلق | baseline، وليس ML أو claim alpha |
 | Volume | relative volume z-score | OHLCV ودلالة حجم موثقة | لا Profile/CVD من volume الشمعة |
 | Fundamental | event-risk window | calendar ممهور زمنيًا | لا sentiment أو اتجاه خبر بلا feed مرخص |
@@ -39,6 +40,8 @@ catalog = engine_catalog()  # capability/status documentation for UI or API
 orchestrator = AnalysisOrchestrator(default_research_engines())
 result = orchestrator.run(snapshot, ("D1", "H4", "H1", "M15"))
 ```
+
+للتجارب الورقية/forward التي تحتاج سجلاً، استخدم `orchestrator.run_and_record(..., ledger=ResearchLedger(...), run_id="...")`. يسجل كل `EngineReport`، بما في ذلك reports ذات المدخلات الناقصة، في JSONL hash-chain حتى لا تختفي نتيجة `NO_RESULT` من المراجعة.
 
 هذا لا يتصل بسوق ولا يضمن أن كل محرك يملك inputsه. المحركات ذات البيانات الناقصة تصدر `EngineReport.required_inputs_missing` أو report غير اتجاهي؛ لا ينبغي استبدالها بنتيجة افتراضية.
 

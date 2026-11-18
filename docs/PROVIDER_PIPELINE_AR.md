@@ -9,7 +9,8 @@
 ```text
 providers/contracts.py  → العقد المجرد للمصدر/الطلب/الاستجابة
 providers/oanda_v20.py  → تحويل candles OANDA v20 عند حقن transport + token read-only
-providers/pipeline.py   → quality gate، lineage receipt، gap/anomaly classification، polling plan
+providers/pipeline.py   → quality gate، lineage receipt، replay/revision/freshness classification، polling plan، snapshot builder
+providers/instruments.py → canonical asset registry منفصل عن vendor symbol ومواصفات التنفيذ
 monitoring.py            → heartbeat/incident state محلي منفصل
 ```
 
@@ -34,10 +35,12 @@ monitoring.py            → heartbeat/incident state محلي منفصل
 - جميع الشموع مغلقة ومرتبة وبدون duplicate/future bar عند `observed_at`.
 - gap count لا يتجاوز `DataPipelinePolicy.max_missing_bars`.
 - anomaly policy لا تطلب الحجر عند وجود range-outlier.
+- `instrument_kind` يطابق `InstrumentRegistry` عند تفعيله، وprice component يطابق الطلب ويحفظ كهوية مستقلة؛ default registry لا يحوّل BID/ASK/MID أو LAST بعضها إلى بعض.
+- freshness لا تتجاوز `max_live_staleness` عند وجود `DataMode.LIVE` وسياسة freshness مهيأة.
 
-الـgap يبقى gap ويظهر بعدد bars المفقودة. range-outlier يقارن range الحالي بوسيط آخر 20 ranges؛ هو **علامة مراجعة** لا دليل سعر خاطئ ولا auto-correction. policies لا تغني عن calendar/holiday/session policy خاصة بالأداة.
+الـgap يبقى gap ويظهر بعدد bars المفقودة. range-outlier يقارن range الحالي بوسيط آخر 20 ranges؛ هو **علامة مراجعة** لا دليل سعر خاطئ ولا auto-correction. replay متطابق يصنّف `EXACT_REPLAY` ولا يضيف bar مكرراً؛ revision متضارب عند نفس identity/time يصنّف `CONFLICTING_REVISION` ويُحجر افتراضياً من دون overwrite. policies لا تغني عن calendar/holiday/session policy خاصة بالأداة.
 
-`latest_accepted()` لا يعيد إلا receipt مقبولاً، بينما receipts المرفوضة محفوظة محلياً لتوضيح سبب الحجر.
+`latest_accepted()` لا يعيد إلا receipt مقبولاً، بينما receipts المرفوضة محفوظة محلياً لتوضيح سبب الحجر. `build_snapshot()` لا يمرر للمحركات إلا normalized bars المقبولة، exact-deduplicated، والمقفلة عند `as_of` لكل timeframe مطلوب وهوية feed متسقة.
 
 ## التحديث الدوري
 

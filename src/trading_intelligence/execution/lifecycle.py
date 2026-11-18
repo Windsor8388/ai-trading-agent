@@ -11,6 +11,8 @@ from __future__ import annotations
 from dataclasses import dataclass, replace
 from datetime import datetime
 from enum import Enum
+import hashlib
+import json
 from typing import Mapping
 
 from ..models import DecisionAction, InstrumentRiskSpec, TradeSignal
@@ -47,6 +49,8 @@ class ExecutionPolicy:
     instrument_specs: Mapping[str, InstrumentRiskSpec]
     max_order_notional: float | None = None
     max_order_cash_risk: float | None = None
+    max_active_orders: int | None = None
+    max_gross_open_notional: float | None = None
 
     def __post_init__(self) -> None:
         if not self.instrument_specs:
@@ -55,11 +59,21 @@ class ExecutionPolicy:
             raise ValueError("max_order_notional must be positive when configured.")
         if self.max_order_cash_risk is not None and self.max_order_cash_risk <= 0:
             raise ValueError("max_order_cash_risk must be positive when configured.")
+        if self.max_active_orders is not None and self.max_active_orders < 1:
+            raise ValueError("max_active_orders must be at least one when configured.")
+        if self.max_gross_open_notional is not None and self.max_gross_open_notional <= 0:
+            raise ValueError("max_gross_open_notional must be positive when configured.")
         for symbol, spec in self.instrument_specs.items():
             if symbol != spec.symbol:
                 raise ValueError("Execution policy instrument-spec keys must match spec symbols.")
 
-    def reject_reason(self, signal: TradeSignal) -> str | None:
+    def reject_reason(
+        self,
+        signal: TradeSignal,
+        *,
+        active_order_count: int = 0,
+        gross_open_notional: float = 0.0,
+    ) -> str | None:
         spec = self.instrument_specs.get(signal.instrument)
         if spec is None:
             return "Instrument is not in the execution allowlist."
@@ -79,6 +93,10 @@ class ExecutionPolicy:
         notional = levels.entry * quantity * spec.contract_multiplier
         if self.max_order_notional is not None and notional > self.max_order_notional:
             return "Order notional exceeds the execution policy limit."
+        if self.max_active_orders is not None and active_order_count >= self.max_active_orders:
+            return "Active-order count exceeds the execution policy limit."
+        if self.max_gross_open_notional is not None and gross_open_notional + notional > self.max_gross_open_notional:
+            return "Gross open notional would exceed the execution policy limit."
         cash_risk = signal.risk.worst_case_cash_risk if signal.risk.worst_case_cash_risk is not None else signal.risk.max_cash_risk
         if self.max_order_cash_risk is not None and (cash_risk is None or cash_risk > self.max_order_cash_risk):
             return "Worst-case cash risk is missing or exceeds the execution policy limit."
@@ -115,6 +133,7 @@ class VenueOrderSnapshot:
 @dataclass(frozen=True, slots=True)
 class OrderRecord:
     client_order_id: str
+    request_fingerprint: str
     signal: TradeSignal
     mode: ExecutionMode
     status: OrderStatus
@@ -172,6 +191,47 @@ class OrderLifecycleManager:
     def orders(self) -> tuple[OrderRecord, ...]:
         return tuple(self._orders.values())
 
+    @staticmethod
+    def _intent_fingerprint(signal: TradeSignal) -> str:
+        """Hash the immutable paper intent before idempotency lookup.
+
+        Reusing a client id for different levels, quantity, or direction is an operator
+        error, not an idempotent retry.  The canonical payload intentionally excludes
+        human-readable evidence text but includes every field that can alter an order.
+        """
+        levels = signal.levels
+        payload = {
+            "instrument": signal.instrument,
+            "action": signal.action.value,
+            "timeframe": signal.timeframe,
+            "strategy_ids": list(signal.strategy_ids),
+            "entry": levels.entry if levels else None,
+            "stop_loss": levels.stop_loss if levels else None,
+            "targets": list(levels.targets) if levels else [],
+            "risk_approved": signal.risk.approved,
+            "quantity": signal.risk.quantity,
+            "worst_case_cash_risk": signal.risk.worst_case_cash_risk,
+            "status": signal.status,
+            "created_at": signal.created_at.isoformat(),
+        }
+        encoded = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+        return hashlib.sha256(encoded).hexdigest()
+
+    def _active_order_exposure(self) -> tuple[int, float]:
+        active_statuses = {OrderStatus.VALIDATED, *self._in_flight, OrderStatus.UNKNOWN}
+        count = 0
+        notional = 0.0
+        for order in self._orders.values():
+            if order.status not in active_statuses:
+                continue
+            count += 1
+            levels = order.signal.levels
+            quantity = order.signal.risk.quantity
+            spec = self.policy.instrument_specs.get(order.signal.instrument) if self.policy else None
+            if levels is not None and quantity is not None and spec is not None:
+                notional += levels.entry * quantity * spec.contract_multiplier
+        return count, notional
+
     def _persist_event(self, order: OrderRecord, event: ExecutionEvent) -> None:
         if self.audit_ledger is None:
             return
@@ -179,6 +239,7 @@ class OrderLifecycleManager:
             f"execution.{event.event_type.lower()}",
             {
                 "client_order_id": order.client_order_id,
+                "request_fingerprint": order.request_fingerprint,
                 "instrument": order.signal.instrument,
                 "mode": order.mode.value,
                 "order_status": order.status.value,
@@ -207,8 +268,12 @@ class OrderLifecycleManager:
         self._aware(at)
         if not client_order_id or client_order_id.strip() != client_order_id:
             raise ValueError("client_order_id must be a non-empty trimmed string.")
+        fingerprint = self._intent_fingerprint(signal)
         if client_order_id in self._orders:
-            return self._orders[client_order_id]
+            existing = self._orders[client_order_id]
+            if existing.request_fingerprint != fingerprint:
+                raise ValueError("client_order_id was already used for a different immutable order intent.")
+            return existing
         reason: str | None = None
         if self._halted:
             reason = "Emergency stop is active."
@@ -225,24 +290,31 @@ class OrderLifecycleManager:
         elif not signal.risk.approved:
             reason = "Independent risk approval is missing."
         elif self.policy is not None:
-            reason = self.policy.reject_reason(signal)
+            active_count, gross_notional = self._active_order_exposure()
+            reason = self.policy.reject_reason(signal, active_order_count=active_count, gross_open_notional=gross_notional)
         status = OrderStatus.REJECTED if reason else OrderStatus.VALIDATED
         event = ExecutionEvent(1, at, "PREPARE_REJECTED" if reason else "VALIDATED", reason or "Local validation passed; awaiting simulated submission.")
-        record = OrderRecord(client_order_id, signal, self.mode, status, at, rejection_reason=reason, events=(event,))
+        record = OrderRecord(client_order_id, fingerprint, signal, self.mode, status, at, rejection_reason=reason, events=(event,))
         return self._store(record)
 
     def record_submitted(self, client_order_id: str, venue_order_id: str, at: datetime) -> OrderRecord:
         order = self._get(client_order_id)
+        if not venue_order_id:
+            raise ValueError("venue_order_id is required after submission.")
+        if order.status in {OrderStatus.SUBMITTED, OrderStatus.ACKNOWLEDGED, OrderStatus.PARTIALLY_FILLED, OrderStatus.FILLED, OrderStatus.CANCEL_REQUESTED, OrderStatus.CANCELLED, OrderStatus.UNKNOWN}:
+            if order.venue_order_id == venue_order_id:
+                return order
+            raise ValueError("Submission retry supplied a venue order id that conflicts with the recorded order.")
         if not self._connected:
             raise RuntimeError("Cannot submit while connection health is unknown; reconcile first.")
         if order.status != OrderStatus.VALIDATED:
             raise ValueError(f"Only VALIDATED orders can be submitted, not {order.status}.")
-        if not venue_order_id:
-            raise ValueError("venue_order_id is required after submission.")
         return self._append(order, at, "SUBMITTED", f"Venue accepted client id as {venue_order_id}.", status=OrderStatus.SUBMITTED, venue_order_id=venue_order_id)
 
     def record_acknowledged(self, client_order_id: str, at: datetime) -> OrderRecord:
         order = self._get(client_order_id)
+        if order.status in {OrderStatus.ACKNOWLEDGED, OrderStatus.PARTIALLY_FILLED, OrderStatus.FILLED, OrderStatus.CANCEL_REQUESTED, OrderStatus.CANCELLED, OrderStatus.UNKNOWN}:
+            return order
         if order.status != OrderStatus.SUBMITTED:
             raise ValueError(f"Only SUBMITTED orders can be acknowledged, not {order.status}.")
         return self._append(order, at, "ACKNOWLEDGED", "Venue acknowledgement recorded.", status=OrderStatus.ACKNOWLEDGED)
@@ -250,6 +322,8 @@ class OrderLifecycleManager:
     def record_fill(self, client_order_id: str, cumulative_quantity: float, at: datetime) -> OrderRecord:
         order = self._get(client_order_id)
         quantity = order.signal.risk.quantity or 0.0
+        if cumulative_quantity == order.filled_quantity and order.status in {OrderStatus.PARTIALLY_FILLED, OrderStatus.FILLED}:
+            return order
         if order.status not in {OrderStatus.ACKNOWLEDGED, OrderStatus.PARTIALLY_FILLED}:
             raise ValueError(f"Cannot record a fill for {order.status}; reconcile UNKNOWN state first.")
         if cumulative_quantity <= order.filled_quantity or cumulative_quantity > quantity:
@@ -261,6 +335,8 @@ class OrderLifecycleManager:
         order = self._get(client_order_id)
         if not reason.strip():
             raise ValueError("A venue rejection requires a non-empty reason.")
+        if order.status == OrderStatus.REJECTED and order.rejection_reason == reason:
+            return order
         if order.status not in {OrderStatus.VALIDATED, OrderStatus.SUBMITTED, OrderStatus.ACKNOWLEDGED}:
             raise ValueError(f"Cannot reject {order.status} order; reconcile UNKNOWN state first.")
         return self._append(order, at, "VENUE_REJECTED", reason, status=OrderStatus.REJECTED, rejection_reason=reason)
@@ -275,6 +351,8 @@ class OrderLifecycleManager:
 
     def record_cancelled(self, client_order_id: str, at: datetime) -> OrderRecord:
         order = self._get(client_order_id)
+        if order.status == OrderStatus.CANCELLED:
+            return order
         if order.status not in {OrderStatus.VALIDATED, OrderStatus.SUBMITTED, OrderStatus.ACKNOWLEDGED, OrderStatus.PARTIALLY_FILLED, OrderStatus.CANCEL_REQUESTED}:
             raise ValueError(f"Cannot cancel {order.status} order; reconcile UNKNOWN state first.")
         return self._append(order, at, "CANCELLED", "Cancellation confirmed.", status=OrderStatus.CANCELLED)

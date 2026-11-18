@@ -10,11 +10,14 @@ class KnowledgeBaseTests(unittest.TestCase):
         self.assertEqual(fvg.school, "ICT")
         self.assertIn("SRC-ICT-MENTORSHIP", fvg.source_ids)
         self.assertTrue(base.related("ict.fair_value_gap"))
+        self.assertEqual(base.strategy("strategy.ict_sweep_fvg_research").strategy_version, "1.0.0")
 
     def test_retrieval_preserves_school_boundary(self) -> None:
         base = KnowledgeBase.from_directory()
         results = base.search("order", school="SMC")
         self.assertEqual([item.concept_id for item in results], ["smc.order_block"])
+        strategies = base.retrieve_strategies("sweep", school="ICT")
+        self.assertEqual(strategies[0].strategy.strategy_id, "strategy.ict_sweep_fvg_research")
 
 
 if __name__ == "__main__":
@@ -28,3 +31,4 @@ class BundledKnowledgeTests(unittest.TestCase):
         repository_root = Path(__file__).resolve().parents[1] / "knowledge"
         self.assertEqual((package_root / "concepts.json").read_bytes(), (repository_root / "concepts.json").read_bytes())
         self.assertEqual((package_root / "sources.json").read_bytes(), (repository_root / "sources.json").read_bytes())
+        self.assertEqual((package_root / "strategies.json").read_bytes(), (repository_root / "strategies.json").read_bytes())

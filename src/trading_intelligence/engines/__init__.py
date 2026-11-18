@@ -4,10 +4,12 @@ from .advanced import (
     FibonacciAnalysisEngine,
     FundamentalEventEngine,
     MarketProfileAvailabilityEngine,
+    ResearchBacklogEngine,
     WyckoffAnalysisEngine,
 )
 from .catalog import EngineAvailability, EngineDescriptor, default_research_engines, engine_catalog
 from .context import (
+    LiquidityProxyEngine,
     SessionContextEngine,
     StructureEventEngine,
     SupplyDemandEngine,
@@ -25,8 +27,9 @@ from .technical import (
 
 __all__ = [
     "ClassicalPatternAvailabilityEngine", "EngineAvailability", "EngineDescriptor", "FibonacciAnalysisEngine",
-    "FundamentalEventEngine", "ICTAnalysisEngine", "MarketProfileAvailabilityEngine", "PriceActionEngine",
-    "QuantitativeAnalysisEngine", "SMCAnalysisEngine", "SessionContextEngine", "StructureEventEngine",
-    "SupplyDemandEngine", "SupportResistanceEngine", "UnavailableInputEngine", "VolumeAnalysisEngine",
-    "VolumeProfileAvailabilityEngine", "WyckoffAnalysisEngine", "default_research_engines", "engine_catalog",
+    "FundamentalEventEngine", "ICTAnalysisEngine", "LiquidityProxyEngine", "MarketProfileAvailabilityEngine",
+    "PriceActionEngine", "QuantitativeAnalysisEngine", "ResearchBacklogEngine", "SMCAnalysisEngine",
+    "SessionContextEngine", "StructureEventEngine", "SupplyDemandEngine", "SupportResistanceEngine",
+    "UnavailableInputEngine", "VolumeAnalysisEngine", "VolumeProfileAvailabilityEngine", "WyckoffAnalysisEngine",
+    "default_research_engines", "engine_catalog",
 ]

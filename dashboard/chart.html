@@ -14,7 +14,7 @@
     <div id="chart" hidden></div>
     <script>
       (() => {
-        const allowedSymbols = new Set(["OANDA:XAUUSD", "COMEX:GC1!", "FX:EURUSD"]);
+        const allowedSymbols = new Set(["OANDA:XAUUSD", "COMEX:GC1!", "FX:EURUSD", "TVC:SPX", "NASDAQ:AAPL", "COINBASE:BTCUSD"]);
         const allowedIntervals = new Set(["1", "5", "15", "30", "60", "240", "D"]);
         const hash = window.location.hash.slice(1);
         const parameters = new URLSearchParams(hash);

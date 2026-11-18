@@ -8,7 +8,7 @@
 PYTHONPATH=src python -m unittest discover -s tests -v
 ```
 
-الحالات الحالية (48 اختباراً):
+الحالات الحالية (57 اختباراً):
 
 - رفض `future/unclosed` bar لمنع look-ahead.
 - رفض ICT evidence على بيانات غير صالحة.
@@ -19,7 +19,7 @@ PYTHONPATH=src python -m unittest discover -s tests -v
 - إيقاف المخاطر عند تجاوز daily loss.
 - منع `TradeSignal` في `ANALYSIS_ONLY` حتى مع decision/risk صالحين.
 - metrics بلا profit factor مصطنع، temporal walk-forward، وMonte Carlo قابل للإعادة بالبذرة.
-- صلاحية مراجع source/relations في قاعدة المعرفة، وتماثل نسختها المرفقة بالحزمة مع السجل canonical.
+- صلاحية source/relations وحقول concept/strategy المنظمة في قاعدة المعرفة، واسترجاع deterministic يبين حقول التطابق، وتماثل النسخ المرفقة بالحزمة مع السجل canonical.
 - استيراد CSV مع SHA-256 وتحويل timezone إلى UTC، وتجميع intraday لا يملأ bucket غير مكتمل.
 - replay history يثبت أن الإشارة لا ترى المستقبل وتدخل عند next-open فقط.
 - بار يلمس stop وtarget يعامل `STOP_FIRST_AMBIGUOUS`، وليس المسار الرابح المفترض.
@@ -32,17 +32,18 @@ PYTHONPATH=src python -m unittest discover -s tests -v
 - attribution للأداء وdrawdown recovery حسب strategy/timeframe/session على fixtures زمنية.
 - عقد `BarRequest` يرفض نطاقاً زمنياً غير متزايد قبل أي provider implementation.
 - Operational monitor يميز feed stale وdata-quality incident ويعيد إلى healthy بعد heartbeat/resolve.
-- execution lifecycle يحجب `ANALYSIS_ONLY`، ويطلب `ExecutionPolicy` صريحة للـPaper (allowlist/product spec/notional/worst-case risk)، ويمنع تكرار `client_order_id`.
+- execution lifecycle يحجب `ANALYSIS_ONLY`، ويطلب `ExecutionPolicy` صريحة للـPaper (allowlist/product spec/notional/worst-case risk/active-order/gross-notional limits)، ويمنع تكرار `client_order_id` أو إعادة استخدامه لـimmutable intent مختلف.
 - lifecycle يسجل hash-chained audit عند ربطه بـ`ResearchLedger`، ويحّول in-flight إلى `UNKNOWN` عند الانقطاع، ويرفض fill reconciliation بلا cumulative quantity موثق، ويحافظ على UNKNOWN أثناء emergency stop حتى المصالحة.
 - dashboard contract يثبت أن وضع `ANALYSIS_ONLY` و`NO TRADE` ظاهر، وأن الرسم الخارجي opt-in داخل iframe sandbox ولا يكتب مدخلاً للمحركات، وأن security headers صالحة.
 - OANDA v20 adapter يُختبر بـtransport fixture: يطلب HTTPS/read-only path، يحفظ hash/lineage، ولا يمرر token إلى source URL، ويرفض bar غير المكتمل من output.
-- `MarketDataPipeline` يحجر gaps وفق policy ولا يملأها، ويسجل receipt وفشل/quality؛ و`PeriodicPollingCoordinator` لا يبدأ daemon ويعمل فقط عند `poll_due()` صريحة.
+- `MarketDataPipeline` يحجر gaps وفق policy ولا يملأها، ويسجل receipt وفشل/quality؛ ويصنف exact replay ويحجر revision متضارب وfeed حي stale، ولا يبني snapshot إلا من bars مقبولة exact-deduplicated؛ و`PeriodicPollingCoordinator` لا يبدأ daemon ويعمل فقط عند `poll_due()` صريحة.
 - range-outlier classifier يضع علامة anomaly ولا يصحح السعر، وVolume Profile engine يرفض اختلاق VAP/TPO/POC من OHLCV.
 - Structure engine يضع BOS/CHoCH/MSS candidate على bars مغلقة فقط؛ وcalendar event gate يختبر embargo زمنيًا على event موثق.
 - paper signal المنظم يحمل conditions ذات حالات `MET/BLOCKED/UNKNOWN` وشرحًا صريحًا أن confidence ليس احتمال ربح.
 - Wyckoff spring candidate وFibonacci confirmed-swing retracement يعملان على fixtures مغلقة فقط؛ ولا يعلنان phase أو سببية ratio.
 - Fundamental event engine يعلن calendar-risk context فقط، وMarket/Volume Profile وClassical Patterns يخرجان missing-input report بدلاً من اختلاق تحليل.
-- Engine catalog موصول بـKnowledgeBase: كل concept ID معلن للمحرك يُتحقق من وجوده ومصدره وعلاقاته عند تحميل السجل.
+- Engine catalog موصول بـKnowledgeBase: كل concept ID معلن للمحرك يُتحقق من وجوده ومصدره وعلاقاته عند تحميل السجل؛ Liquidity proxy وSession context وML backlog تصدر reports مستقلة، وتسجيل orchestrator hash-chained يحفظ حتى results ذات missing input.
+- `InstrumentRegistry` يثبت فصل XAU/USD عن GC ويدرج FX والمؤشرات والأسهم والعملات الرقمية من دون اختراع vendor mapping أو مواصفات تنفيذ.
 
 هذه اختبارات سلوك برنامج وfixture اصطناعية، **وليست Backtest على السوق ولا إثبات ربحية**.
 

@@ -57,7 +57,7 @@ stateDiagram-v2
 ## ضوابط التنفيذ المطلوبة قبل أي adapter حقيقي
 
 1. **التحقق قبل الإرسال:** instrument/account allowlist، market status، freshness، signal expiry، direction/stop/target، quantity step/minimum، price bands، max notional، margin، risk approval، event/gap embargo.
-2. **Idempotency:** `client_order_id` ثابت لكل intent؛ إعادة الطلب تعيد record السابق ولا تنشئ أمرين.
+2. **Idempotency:** `client_order_id` ثابت لكل intent ومعه fingerprint للاتجاه/levels/quantity/risk؛ إعادة نفس payload تعيد record السابق، أما إعادة ID مع intent مختلف فترفض ولا تنشئ أمراً ثانياً.
 3. **state verification:** يحتفظ adapter بـvenue order id، acknowledgement/fill/reject timestamp، raw response hash، وsource sequence إن وجد.
 4. **رفض الأمر:** يتحول إلى `REJECTED` بسبب موثق؛ لا يعاد الإرسال تلقائياً بسعر/حجم جديد.
 5. **انقطاع الشبكة:** الأوامر in-flight تصبح `UNKNOWN`؛ لا يفترض النظام أنها ألغيت. يعاد الاتصال ثم يطلب snapshot من venue ويعمل reconciliation. عدم ظهور order في snapshot لا يثبت الإلغاء.
@@ -69,8 +69,9 @@ stateDiagram-v2
 ## ما ينفذ الآن في الكود
 
 - `OrderLifecycleManager.prepare()` يمنع `ANALYSIS_ONLY` و`LIVE_DISABLED`. وضع `PAPER` يطلب `ExecutionPolicy` صريحة بدلاً من افتراض مواصفات المنتج من الرمز.
-- `ExecutionPolicy` يطبق allowlist لـinstrument specs، minimum/quantity step، اتجاه levels، وحدود notional وworst-case cash risk إن ضُبطت؛ ولا يستطيع قبول risk غير الموافق عليه.
-- يمنع التكرار بواسطة `client_order_id`، ويرفض submission إن كانت صحة الاتصال غير مؤكدة.
+- `ExecutionPolicy` يطبق allowlist لـinstrument specs، minimum/quantity step، اتجاه levels، وحدود notional وworst-case cash risk، ويمكنه فرض سقف active orders وgross open notional؛ ولا يستطيع قبول risk غير الموافق عليه.
+- يمنع التكرار بواسطة `client_order_id` + immutable intent fingerprint؛ ويرفض إعادة استخدام ID مع تغير direction/levels/quantity/risk. Retries المتطابقة لـsubmission/ack/fill/cancel لا تضيف transition أو fill ثانياً، ويرفض venue id متضارب.
+- يرفض submission إن كانت صحة الاتصال غير مؤكدة.
 - يمكن ربط lifecycle بـ`ResearchLedger`: يسجل validation/submission/ack/fill/reject/cancel/disconnect/reconciliation في JSONL hash-chain؛ فشل append يمنع transition المحلي.
 - يجعل الحالة `UNKNOWN` عند الانقطاع بدلاً من افتراض outcome. reconciliation لجزء/كل fill يتطلب `VenueOrderSnapshot` بتوقيت ومقدار cumulative quantity؛ snapshot الخالي من client id لا يثبت الإلغاء.
 - `emergency_stop()` يحجب intents الجديدة؛ يُبقي UNKNOWN غير محسوم ويسجل أن reconciliation مطلوب. لا يرسل أي نداء خارجي.

@@ -23,7 +23,10 @@ const allowedIntervals = new Set([...chartInterval.options].map((option) => opti
 const symbolLabels = {
   'OANDA:XAUUSD': 'XAU/USD · Spot',
   'COMEX:GC1!': 'GC · Futures continuous',
-  'FX:EURUSD': 'EUR/USD · مثال',
+  'FX:EURUSD': 'EUR/USD · Spot',
+  'TVC:SPX': 'US500 · Cash index',
+  'NASDAQ:AAPL': 'AAPL · Equity',
+  'COINBASE:BTCUSD': 'BTC/USD · Crypto spot',
 };
 const intervalLabels = { 1: 'M1', 5: 'M5', 15: 'M15', 30: 'M30', 60: 'H1', 240: 'H4', D: 'D1' };
 

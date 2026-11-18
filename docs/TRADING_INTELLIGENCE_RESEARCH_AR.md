@@ -44,7 +44,7 @@
 | ML / DL / RL | classification، forecasting، anomaly، regime، policy learning | feature store زمني + labels + folds | probabilistic model + calibration | لا نموذج ML قبل baseline وOOS lift |
 | Cross-asset / derivatives | GC term structure، options، ETF flows، FX/DXY، rates | بيانات كل سوق موائمة زمنياً | context وليس بديل سعر | مرحلة لاحقة وبيانات منفصلة |
 
-المفاهيم التفصيلية، تعريفها التشغيلي، علاقاتها، حالة الدليل، ومصادرها موجودة بصيغة قابلة للآلة في [`knowledge/concepts.json`](../knowledge/concepts.json)، وسجل المصادر في [`knowledge/sources.json`](../knowledge/sources.json). لكل مفهوم `id` ثابت و`source_ids` و`updated_at`؛ لا تستخدم واجهة المحرك تسمية حرة غير قابلة للتتبع.
+المفاهيم التفصيلية، تعريفها التشغيلي، علاقاتها، حالة الدليل، ومصادرها موجودة بصيغة قابلة للآلة في [`knowledge/concepts.json`](../knowledge/concepts.json)، واستراتيجيات البحث المجمدة في [`knowledge/strategies.json`](../knowledge/strategies.json)، وسجل المصادر في [`knowledge/sources.json`](../knowledge/sources.json). في schema `1.1` لكل مفهوم `id` ثابت و`rule_version` و`updated_at` و`use_cases` و`signal_validity` و`invalidation` و`examples` و`common_failures` و`evidence_notes` و`source_ids`؛ ولكل استراتيجية rules/confirmation/no-trade/failure/version/concept/source links؛ ولكل مصدر `source_version`/تاريخ access. يتيح `KnowledgeBase.retrieve()` و`retrieve_strategies()` استرجاعاً deterministic يذكر حقول التطابق، ولا تستخدم واجهة المحرك تسمية حرة غير قابلة للتتبع.
 
 ### نطاق التوسعة المسجل (ليس ادعاء تنفيذ)
 

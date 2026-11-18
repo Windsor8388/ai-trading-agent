@@ -1,7 +1,7 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "updated_at": "2026-11-18",
-  "purpose": "Curated source registry. A source documents a definition, contract, API, or validation method; it does not automatically validate a trading edge.",
+  "purpose": "Curated source registry. A source documents a definition, contract, API, or validation method; it does not automatically validate a trading edge. Each record includes the access/publication reference used by this registry version.",
   "sources": [
     {
       "id": "SRC-CME-GC-OVERVIEW",
@@ -10,7 +10,8 @@
       "url": "https://www.cmegroup.com/education/lessons/product-gold",
       "published_or_accessed": "2026-11-18",
       "type": "primary_market_documentation",
-      "use": "GC product identity and contract context"
+      "use": "GC product identity and contract context",
+      "source_version": "accessed-2026-11-18; publication/reference=2026-11-18"
     },
     {
       "id": "SRC-CME-GC-RULEBOOK",
@@ -19,7 +20,8 @@
       "url": "https://www.cmegroup.com/rulebook/COMEX/1a/113.pdf",
       "published_or_accessed": "2026-11-18",
       "type": "primary_market_documentation",
-      "use": "GC contract unit and minimum price fluctuation"
+      "use": "GC contract unit and minimum price fluctuation",
+      "source_version": "accessed-2026-11-18; publication/reference=2026-11-18"
     },
     {
       "id": "SRC-OANDA-CANDLES",
@@ -28,7 +30,8 @@
       "url": "https://developer.oanda.com/rest-live-v20/pricing-ep/",
       "published_or_accessed": "2026-11-18",
       "type": "primary_api_documentation",
-      "use": "Candle retrieval contract, price component and alignment fields"
+      "use": "Candle retrieval contract, price component and alignment fields",
+      "source_version": "accessed-2026-11-18; publication/reference=2026-11-18"
     },
     {
       "id": "SRC-OANDA-COMPLETE-BAR",
@@ -37,7 +40,8 @@
       "url": "https://developer.oanda.com/rest-live-v20/instrument-df/",
       "published_or_accessed": "2026-11-18",
       "type": "primary_api_documentation",
-      "use": "completed-candle field and OHLC shape"
+      "use": "completed-candle field and OHLC shape",
+      "source_version": "accessed-2026-11-18; publication/reference=2026-11-18"
     },
     {
       "id": "SRC-BAILEY-PBO",
@@ -46,7 +50,8 @@
       "url": "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2326253",
       "published_or_accessed": "2017 publication; accessed 2026-11-18",
       "type": "peer_reviewed_or_working_paper",
-      "use": "CSCV / probability-of-backtest-overfitting validation policy"
+      "use": "CSCV / probability-of-backtest-overfitting validation policy",
+      "source_version": "accessed-2026-11-18; publication/reference=2017 publication; accessed 2026-11-18"
     },
     {
       "id": "SRC-BAILEY-DSR",
@@ -55,7 +60,8 @@
       "url": "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2460551",
       "published_or_accessed": "2014 publication; accessed 2026-11-18",
       "type": "peer_reviewed_or_working_paper",
-      "use": "multiple-testing-aware Sharpe analysis"
+      "use": "multiple-testing-aware Sharpe analysis",
+      "source_version": "accessed-2026-11-18; publication/reference=2014 publication; accessed 2026-11-18"
     },
     {
       "id": "SRC-CFTC-GOLD-RISK",
@@ -64,7 +70,8 @@
       "url": "https://www.cftc.gov/LearnAndProtect/AdvisoriesAndArticles/gold_is_no_safe_investment.htm",
       "published_or_accessed": "2026-11-18",
       "type": "regulatory_education",
-      "use": "risk, leverage and cost warning"
+      "use": "risk, leverage and cost warning",
+      "source_version": "accessed-2026-11-18; publication/reference=2026-11-18"
     },
     {
       "id": "SRC-FAMA-EFFICIENT-MARKETS",
@@ -73,7 +80,8 @@
       "url": "https://doi.org/10.1111/j.1540-6261.1970.tb00518.x",
       "published_or_accessed": "1970; accessed 2026-11-18",
       "type": "peer_reviewed",
-      "use": "baseline against which predictive claims must be tested"
+      "use": "baseline against which predictive claims must be tested",
+      "source_version": "accessed-2026-11-18; publication/reference=1970; accessed 2026-11-18"
     },
     {
       "id": "SRC-HASBROUCK-MICROSTRUCTURE",
@@ -82,7 +90,8 @@
       "url": "https://global.oup.com/academic/product/empirical-market-microstructure-9780195301648",
       "published_or_accessed": "2007; accessed 2026-11-18",
       "type": "academic_book",
-      "use": "order-flow and trade/quote data modelling foundation"
+      "use": "order-flow and trade/quote data modelling foundation",
+      "source_version": "accessed-2026-11-18; publication/reference=2007; accessed 2026-11-18"
     },
     {
       "id": "SRC-WYCKOFF-INSTITUTE",
@@ -91,7 +100,8 @@
       "url": "https://www.wyckoffanalytics.com/wyckoff-method/",
       "published_or_accessed": "accessed 2026-11-18",
       "type": "methodology_reference",
-      "use": "terminology reference only; empirical value still requires independent testing"
+      "use": "terminology reference only; empirical value still requires independent testing",
+      "source_version": "accessed-2026-11-18; publication/reference=accessed 2026-11-18"
     },
     {
       "id": "SRC-ICT-MENTORSHIP",
@@ -100,7 +110,8 @@
       "url": "https://www.youtube.com/@InnerCircleTrader",
       "published_or_accessed": "accessed 2026-11-18",
       "type": "practitioner_primary_material",
-      "use": "ICT vocabulary provenance; no empirical validation claim"
+      "use": "ICT vocabulary provenance; no empirical validation claim",
+      "source_version": "accessed-2026-11-18; publication/reference=accessed 2026-11-18"
     }
   ]
 }

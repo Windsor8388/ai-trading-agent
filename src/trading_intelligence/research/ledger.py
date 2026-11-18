@@ -10,6 +10,7 @@ import hashlib
 import json
 from dataclasses import asdict, dataclass, is_dataclass
 from datetime import datetime, timezone
+from enum import Enum
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -34,6 +35,8 @@ class ResearchLedger:
     def _json_safe(value: Any) -> Any:
         if is_dataclass(value):
             return ResearchLedger._json_safe(asdict(value))
+        if isinstance(value, Enum):
+            return ResearchLedger._json_safe(value.value)
         if isinstance(value, datetime):
             if value.tzinfo is None:
                 raise ValueError("Ledger timestamps must be timezone-aware.")
