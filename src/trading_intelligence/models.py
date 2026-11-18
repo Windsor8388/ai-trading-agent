@@ -225,8 +225,27 @@ class RiskAssessment:
 
 
 @dataclass(frozen=True, slots=True)
+class SignalCondition:
+    """One structured precondition or blocker attached to a generated signal."""
+
+    condition_id: str
+    category: str  # data, analysis, entry, risk, operating_mode
+    state: str  # MET, BLOCKED, UNKNOWN
+    detail: str
+
+    def __post_init__(self) -> None:
+        if not self.condition_id or not self.category or self.state not in {"MET", "BLOCKED", "UNKNOWN"}:
+            raise ValueError("Signal conditions require id/category and state MET, BLOCKED, or UNKNOWN.")
+
+
+@dataclass(frozen=True, slots=True)
 class TradeSignal:
-    """Structured candidate signal. In this prototype all live execution remains disabled."""
+    """Structured candidate signal. In this prototype all live execution remains disabled.
+
+    Confidence represents policy-weighted evidence agreement, not a probability of profit.
+    Entry/stop/targets are reference levels only until a separately approved paper adapter
+    validates the product and lifecycle state.
+    """
 
     instrument: str
     action: DecisionAction
@@ -241,3 +260,5 @@ class TradeSignal:
     opposing_reasons: Sequence[str]
     invalidation_conditions: Sequence[str]
     status: str
+    conditions: Sequence[SignalCondition] = field(default_factory=tuple)
+    confidence_meaning: str = "Policy-weighted evidence agreement; not a probability of profit."

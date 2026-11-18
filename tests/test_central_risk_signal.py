@@ -75,6 +75,28 @@ class CentralRiskSignalTests(unittest.TestCase):
         self.assertEqual(outcome.signal.action, DecisionAction.NO_TRADE)
         self.assertEqual(outcome.signal.status, "BLOCKED")
         self.assertTrue(any("analysis-only" in reason for reason in outcome.reasons))
+        self.assertIn("operating_mode.paper", {item.condition_id for item in outcome.signal.conditions})
+
+    def test_verified_paper_signal_has_structured_conditions_and_non_probabilistic_confidence(self) -> None:
+        decision = CentralTradingIntelligenceEngine().decide([
+            report("quant", evidence("quant", "statistical_trend", .7)),
+            report("volume", evidence("volume", "volume_confirmation", .6)),
+        ])
+        bar = Candle(NOW - timedelta(hours=1), NOW, 100, 101, 99, 100.5, 100)
+        snapshot = MarketSnapshot(NOW, FeedMetadata("fixture", "XAUUSD", "XAUUSD_SPOT", "MID", DataMode.PAPER, NOW, live_feed_verified=True), {"H1": (bar,)})
+        outcome = TradeSignalEngine(RiskManagementEngine(), OperatingMode.PAPER).build(
+            decision, snapshot, "H1", ProposedLevels(100, 99, (102,), "closed-bar reference"), PortfolioState(10_000),
+            InstrumentRiskSpec("XAUUSD", 100, .01, .01), ("quant.trend_baseline", "volume.relative_volume"),
+        )
+        self.assertEqual(outcome.signal.action, DecisionAction.BUY)
+        self.assertEqual(outcome.signal.status, "PAPER_CANDIDATE")
+        self.assertIsNotNone(outcome.signal.levels)
+        self.assertGreater(outcome.signal.risk.reward_to_risk or 0, 1)
+        self.assertIn("not a probability", outcome.signal.confidence_meaning)
+        states = {item.condition_id: item.state for item in outcome.signal.conditions}
+        self.assertEqual(states["data.closed_candles"], "MET")
+        self.assertEqual(states["entry.levels"], "MET")
+        self.assertEqual(states["risk.independent_gate"], "MET")
 
 
 if __name__ == "__main__":

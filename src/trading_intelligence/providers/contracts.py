@@ -25,10 +25,14 @@ class BarRequest:
 
 @dataclass(frozen=True, slots=True)
 class MarketDataResponse:
+    """Read-only completed-bar payload plus lineage and adapter observations."""
+
     candles: Sequence[Candle]
     feed: FeedMetadata
     request_id: str
     raw_payload_sha256: str
+    dropped_incomplete_bars: int = 0
+    provider_warnings: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)

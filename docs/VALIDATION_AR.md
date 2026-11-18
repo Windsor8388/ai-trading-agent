@@ -8,7 +8,7 @@
 PYTHONPATH=src python -m unittest discover -s tests -v
 ```
 
-الحالات الحالية (36 اختباراً):
+الحالات الحالية (43 اختباراً):
 
 - رفض `future/unclosed` bar لمنع look-ahead.
 - رفض ICT evidence على بيانات غير صالحة.
@@ -35,6 +35,11 @@ PYTHONPATH=src python -m unittest discover -s tests -v
 - execution lifecycle يحجب `ANALYSIS_ONLY`، ويطلب `ExecutionPolicy` صريحة للـPaper (allowlist/product spec/notional/worst-case risk)، ويمنع تكرار `client_order_id`.
 - lifecycle يسجل hash-chained audit عند ربطه بـ`ResearchLedger`، ويحّول in-flight إلى `UNKNOWN` عند الانقطاع، ويرفض fill reconciliation بلا cumulative quantity موثق، ويحافظ على UNKNOWN أثناء emergency stop حتى المصالحة.
 - dashboard contract يثبت أن وضع `ANALYSIS_ONLY` و`NO TRADE` ظاهر، وأن الرسم الخارجي opt-in داخل iframe sandbox ولا يكتب مدخلاً للمحركات، وأن security headers صالحة.
+- OANDA v20 adapter يُختبر بـtransport fixture: يطلب HTTPS/read-only path، يحفظ hash/lineage، ولا يمرر token إلى source URL، ويرفض bar غير المكتمل من output.
+- `MarketDataPipeline` يحجر gaps وفق policy ولا يملأها، ويسجل receipt وفشل/quality؛ و`PeriodicPollingCoordinator` لا يبدأ daemon ويعمل فقط عند `poll_due()` صريحة.
+- range-outlier classifier يضع علامة anomaly ولا يصحح السعر، وVolume Profile engine يرفض اختلاق VAP/TPO/POC من OHLCV.
+- Structure engine يضع BOS/CHoCH/MSS candidate على bars مغلقة فقط؛ وcalendar event gate يختبر embargo زمنيًا على event موثق.
+- paper signal المنظم يحمل conditions ذات حالات `MET/BLOCKED/UNKNOWN` وشرحًا صريحًا أن confidence ليس احتمال ربح.
 
 هذه اختبارات سلوك برنامج وfixture اصطناعية، **وليست Backtest على السوق ولا إثبات ربحية**.
 

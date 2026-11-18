@@ -127,7 +127,9 @@ flowchart TD
 
 ## 9) واجهات التكامل ومصادر البيانات المطلوبة حسب الوظيفة
 
-تمت إضافة عقود Python read-only في `providers/contracts.py`: `BarRequest`، `MarketDataResponse`، `MarketDataProvider`، `EconomicEvent` و`EconomicCalendarProvider`. لا توجد implementation شبكية أو credentials؛ هذا فصل مقصود بين العقد ومزود البيانات.
+تمت إضافة عقود Python read-only في `providers/contracts.py`: `BarRequest`، `MarketDataResponse`، `MarketDataProvider`، `EconomicEvent` و`EconomicCalendarProvider`. كما أضيف `providers/oanda_v20.py` كـ**adapter قابل للتشغيل عند الحقن الصريح** لـtransport وtoken read-only، لكنه لا يقرأ environment ولا يبدأ اتصالًا من تلقاء نفسه ولا توجد credentials في المستودع. يرفض D1/W1/MN حتى يضاف session-alignment policy، ويُسقط `complete=false`، ويحفظ raw SHA-256 وrequest lineage بلا token في URL المسجل.
+
+أضيف أيضًا `providers/pipeline.py`: `MarketDataPipeline` يطابق provider/instrument/component، يفحص bars المغلقة، يصنف gaps وrange anomalies ولا يملأها، ويصدر `IngestionReceipt` مقبول أو محجور. و`PeriodicPollingCoordinator` هو **خطة polling deterministic** لا daemon؛ لا يستدعي adapter إلا حين يستدعي التطبيق `poll_due()` صراحة.
 
 | الوظيفة | مصادر/واجهات مرشحة | الحد الأدنى الذي يجب أن يوفره المصدر | شرط قبل الاعتماد |
 |---|---|---|---|
@@ -137,6 +139,6 @@ flowchart TD
 | calendar/macros | calendar مرخّص أو إصدارات الجهات الرسمية مثل FRED/BLS/BEA حيث يناسب | scheduled/published UTC، actual/consensus/prior/revisions/vintage | حفظ source وrevision؛ event embargo عند العطل |
 | news/NLP | مزود أخبار مرخّص | publish/received UTC، source/license، duplicate/revision IDs | latency/rights/entity policy قبل أي feature |
 | persistence/metadata | PostgreSQL؛ Supabase خيار managed لاحق | migrations، RLS، audit metadata، no raw payload secrets | لا اتصال مُنشأ في هذا المستودع |
-| dashboard hosting | React API client؛ Vercel خيار hosting لاحق | CSP/auth/RBAC، relative API URLs، no client secrets | لا نشر أو integration مُنشأ حالياً |
+| dashboard hosting | لوحة static منشورة على Vercel | CSP، relative URLs، no client secrets، وحد عرض خارجي opt-in | لا backend/API أو provider integration في الواجهة |
 
 مراجع OANDA وCME الموجودة في [`knowledge/sources.json`](../knowledge/sources.json) تثبت شكل product/API المعروض في وثائقها فقط. لا تثبت ملاءمة مصدر بعينه، تسعيره، ترخيصه، توفره في منطقة المستخدم، أو وجود بيانات حية.

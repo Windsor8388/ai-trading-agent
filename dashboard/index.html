@@ -30,7 +30,7 @@
     <main id="main" class="shell">
       <section class="hero" aria-labelledby="hero-heading">
         <div class="hero-copy">
-          <p class="eyebrow">SYSTEM CONTROL ROOM · V0.4</p>
+          <p class="eyebrow">SYSTEM CONTROL ROOM · V0.5</p>
           <h2 id="hero-heading">عقل بحثي متعدد المدارس،<br /><em>لا يتداول قبل أن يثبت.</em></h2>
           <p class="hero-text">منصة بحث وتحليل قابلة للتدقيق تجمع مدارس السوق، تفصل الأدلة المترابطة، وتضع حماية رأس المال فوق أي إشارة. هذه الواجهة تعرض حالة النموذج الأولي المحلي فقط — لا يوجد مزود أسعار حي أو وسيط متصل.</p>
           <div class="hero-actions">
@@ -84,7 +84,10 @@
             <article class="engine-card signal-neutral"><div class="engine-top"><span>SMC</span><i>مراقبة</i></div><h3>Order Block proxy</h3><p>Structure + displacement مع شروط إبطال مستقلة.</p><div class="meter"><span style="width:15%"></span></div><small>Correlated structure evidence</small></article>
             <article class="engine-card signal-buy"><div class="engine-top"><span>QUANT</span><i>مرصود</i></div><h3>اتجاه/تقلب</h3><p>SMA 20/50 مع بوابة تقلب شفافة وخط أساس قابل للمقارنة.</p><div class="meter"><span style="width:50%"></span></div><small>Statistical trend group</small></article>
             <article class="engine-card signal-neutral"><div class="engine-top"><span>VOLUME</span><i>معلق</i></div><h3>تأكيد الحجم</h3><p>لا يصدر حكماً إن كانت دلالة الحجم غير موثقة.</p><div class="meter"><span style="width:10%"></span></div><small>Requires volume semantics</small></article>
-            <article class="engine-card signal-blocked"><div class="engine-top"><span>ORDER FLOW</span><i>محجوب</i></div><h3>Delta / CVD / Footprint</h3><p>يتطلب tick trades وquotes أو L2 حقيقياً، وليس OHLCV.</p><div class="meter"><span style="width:0%"></span></div><small>Provider required</small></article>
+            <article class="engine-card signal-neutral"><div class="engine-top"><span>STRUCTURE EVENTS</span><i>مراقبة</i></div><h3>BOS / CHoCH / MSS</h3><p>يكشف كسر swing على bar مغلق فقط؛ CHoCH/MSS مرشح يحتاج تأكيداً مستقلاً.</p><div class="meter"><span style="width:20%"></span></div><small>Correlated market structure group</small></article>
+            <article class="engine-card signal-neutral"><div class="engine-top"><span>S/R &amp; SUPPLY/DEMAND</span><i>مراقبة</i></div><h3>مناطق قابلة للاختبار</h3><p>pivot-touch clusters وdisplacement-zone proxies، وليست مستويات يقينية أو دفتر أوامر.</p><div class="meter"><span style="width:18%"></span></div><small>Closed-bar hypotheses only</small></article>
+            <article class="engine-card signal-neutral"><div class="engine-top"><span>SESSION CONTEXT</span><i>وصفي</i></div><h3>سياق UTC</h3><p>تصنيف جلسات عام فقط؛ لا يمثل calendar للـvenue أو DST أو ساعات تداول الأداة.</p><div class="meter"><span style="width:10%"></span></div><small>Context, not directional evidence</small></article>
+            <article class="engine-card signal-blocked"><div class="engine-top"><span>ORDER FLOW / PROFILE</span><i>محجوب</i></div><h3>Delta / CVD / Footprint / VAP</h3><p>يتطلب tick trades وquotes أو L2 وvolume-at-price حقيقياً؛ لا يُشتق من OHLCV.</p><div class="meter"><span style="width:0%"></span></div><small>Provider required</small></article>
           </div>
         </div>
 
@@ -177,8 +180,8 @@
       </section>
 
       <section class="integration-grid" aria-labelledby="integration-heading">
-        <article><p class="eyebrow">BUILD NOW</p><h2 id="integration-heading">المكوّنات المتاحة محلياً</h2><ul><li>Knowledge Base بإصدار ومصادر</li><li>محركات تحليل مستقلة</li><li>CSV historical ingestion + manifest</li><li>Backtest وanalytics وRiskBook</li><li>Paper simulator وhash ledger</li></ul></article>
-        <article class="requires"><p class="eyebrow">REQUIRES EXTERNAL SERVICES</p><h2>قبل البيانات الحية أو التنفيذ</h2><ul><li>مزود XAU/USD أو GC مرخّص</li><li>contract specs وbid/ask/calendar</li><li>مخزن دائم وRBAC وaudit</li><li>تقويم أخبار / L2 / tick data عند الحاجة</li><li>موافقة صريحة قبل أي broker API</li></ul></article>
+        <article><p class="eyebrow">BUILD NOW</p><h2 id="integration-heading">المكوّنات المتاحة محلياً</h2><ul><li>Knowledge Base بإصدار ومصادر</li><li>محركات تحليل مستقلة</li><li>CSV historical ingestion + manifest</li><li>OANDA read-only adapter + quality/polling plan</li><li>BOS/CHoCH/MSS وS/R وSupply/Demand context</li><li>Backtest وanalytics وRiskBook</li><li>Paper simulator وhash ledger</li></ul></article>
+        <article class="requires"><p class="eyebrow">REQUIRES EXTERNAL SERVICES</p><h2>قبل البيانات الحية أو التنفيذ</h2><ul><li>تفويض read-only لمزود XAU/USD أو GC مرخّص</li><li>contract specs وbid/ask/calendar</li><li>مخزن دائم وRBAC وaudit</li><li>تقويم أخبار / L2 / tick data عند الحاجة</li><li>موافقة صريحة قبل أي broker API</li></ul></article>
       </section>
     </main>
 

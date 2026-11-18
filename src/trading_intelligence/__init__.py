@@ -5,10 +5,10 @@ execution capability. It is an initial research prototype, not financial advice.
 """
 
 from .knowledge import KnowledgeBase
-from .models import Candle, DecisionAction, MarketSnapshot
+from .models import Candle, DecisionAction, MarketSnapshot, SignalCondition
 from .monitoring import OperationalMonitor
 from .risk import RiskManagementEngine
 from .risk_book import PortfolioRiskBook
 
-__all__ = ["Candle", "DecisionAction", "KnowledgeBase", "MarketSnapshot", "OperationalMonitor", "PortfolioRiskBook", "RiskManagementEngine"]
-__version__ = "0.4.0"
+__all__ = ["Candle", "DecisionAction", "KnowledgeBase", "MarketSnapshot", "OperationalMonitor", "PortfolioRiskBook", "RiskManagementEngine", "SignalCondition"]
+__version__ = "0.5.0"

@@ -1,6 +1,6 @@
 # التصميم المعماري لنظام Trading Intelligence
 
-**الإصدار:** 0.4.0 · **الوضع التشغيلي الحالي:** `ANALYSIS_ONLY` محلي وبدون أي data feed للنظام متصل. يوجد CSV importer وhistorical replay وPaper simulator وrisk/performance analytics وexecution lifecycle محلية، لكنها لا تتصل بسوق أو وسيط. توجد لوحة static مع رسم TradingView خارجي اختياري ومعزول؛ العرض ليس data feed ولا input للمحركات.
+**الإصدار:** 0.5.0 · **الوضع التشغيلي الحالي:** `ANALYSIS_ONLY` محلي وبدون أي data feed للنظام متصل. يوجد CSV importer وhistorical replay وPaper simulator وrisk/performance analytics وexecution lifecycle محلية، لكنها لا تتصل بسوق أو وسيط. توجد لوحة static مع رسم TradingView خارجي اختياري ومعزول؛ العرض ليس data feed ولا input للمحركات.
 التصميم يفصل عمداً البحث والتحليل والورق والتنفيذ. لا يجوز اختصار هذه المسارات لمجرد أن جميعها تستخدم كلمة "signal".
 
 ## 1) المعمارية المستهدفة
@@ -131,6 +131,10 @@ NormalizedBar
 | `ExecutionPolicy` | `execution/lifecycle.py` | allowlist لـproduct specs وquantity/notional/cash-risk limits؛ لا يوافق على risk فاشل |
 | `OrderLifecycleManager` | `execution/lifecycle.py` | intent idempotency، disconnect=`UNKNOWN`، reconciliation، emergency stop؛ بلا شبكة |
 | `VenueOrderSnapshot` | `execution/lifecycle.py` | snapshot ممهور زمنيًا وcumulative quantity لحل UNKNOWN؛ لا fill بلا كمية |
+| `MarketDataPipeline` | `providers/pipeline.py` | identity/closed-bar/gap/anomaly gate + receipt + latest accepted lineage؛ لا fill أو auto-correct |
+| `PeriodicPollingCoordinator` | `providers/pipeline.py` | polling plan deterministic لا يبدأ daemon أو اتصال بلا `poll_due()` صريحة |
+| `OandaV20MarketDataProvider` | `providers/oanda_v20.py` | read-only injected transport، complete bars فقط، raw hash؛ لا token أو اتصال مُهيأ في Git |
+| `EconomicEventRiskGate` | `events.py` | embargo حول event supplied وممهور زمنيًا؛ لا يجلب أخبارًا بنفسه |
 
 ### عقود واجهات المرحلة التالية
 
@@ -154,7 +158,7 @@ class ExecutionVenue(Protocol):
 
 ## 4) المحركات واستقلال المسؤولية
 
-| المحرك | ما يملكه | ما لا يملكه | حالة v0.4 |
+| المحرك | ما يملكه | ما لا يملكه | حالة v0.5 |
 |---|---|---|---|
 | ICT | FVG وequal-high/low sweep heuristics بإصدار | تعريف SMC أو دليل order book | منفذ تجريبي |
 | SMC | structure + displacement/order-block proxy | تنفيذ ICT أو sizing | منفذ تجريبي |
@@ -205,12 +209,16 @@ src/trading_intelligence/
   signals.py                    # analysis/paper safety gate
   paper.py                      # local idempotent paper state machine; no broker
   execution/lifecycle.py         # policy-gated, disconnected lifecycle + reconciliation state machine
+  events.py                      # supplied-calendar embargo gate; no news fetcher
   providers/contracts.py        # read-only market/calendar API contracts
+  providers/oanda_v20.py        # explicit injected read-only OANDA candle adapter
+  providers/pipeline.py         # quality/lineage receipts + explicit periodic polling plan
   providers/csv_ohlcv.py        # strict user-supplied historical OHLCV importer
   backtest/engine.py            # next-open, stop-first historical replay
   engines/
     indicators.py               # transparent no-lookahead primitives
-    technical.py                # first independent engines
+    technical.py                # price action / ICT / SMC / volume / quant engines
+    context.py                  # BOS/CHoCH/MSS, S/R, S/D, session and explicit volume-profile boundary
   research/metrics.py           # metrics, bootstrap, temporal folds
   research/analytics.py         # DD/PF/expectancy and strategy/timeframe/session attribution
   research/ledger.py            # append-only SHA-256 experiment/prediction trail
@@ -221,6 +229,8 @@ docs/
   VALIDATION_AR.md
   EXECUTION_SAFETY_AR.md
   DASHBOARD_AR.md
+  PROVIDER_PIPELINE_AR.md
+  TRADE_SIGNAL_CONTRACT_AR.md
 
 dashboard/                      # static RTL control room; opt-in sandboxed third-party chart only
 ```
