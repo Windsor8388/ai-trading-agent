@@ -68,11 +68,12 @@ stateDiagram-v2
 
 ## ما ينفذ الآن في الكود
 
-- `OrderLifecycleManager.prepare()` يمنع `ANALYSIS_ONLY` و`LIVE_DISABLED` ويرفض signal/levels/risk غير الصالحة.
-- يمنع التكرار بواسطة `client_order_id`.
-- يسجل validation/submission/ack/fill/reject/cancel/disconnect/reconciliation events بتسلسل محلي.
-- يجعل الحالة `UNKNOWN` عند الانقطاع بدلاً من افتراض outcome.
-- `emergency_stop()` يحجب intents الجديدة؛ لا يرسل أي نداء خارجي.
+- `OrderLifecycleManager.prepare()` يمنع `ANALYSIS_ONLY` و`LIVE_DISABLED`. وضع `PAPER` يطلب `ExecutionPolicy` صريحة بدلاً من افتراض مواصفات المنتج من الرمز.
+- `ExecutionPolicy` يطبق allowlist لـinstrument specs، minimum/quantity step، اتجاه levels، وحدود notional وworst-case cash risk إن ضُبطت؛ ولا يستطيع قبول risk غير الموافق عليه.
+- يمنع التكرار بواسطة `client_order_id`، ويرفض submission إن كانت صحة الاتصال غير مؤكدة.
+- يمكن ربط lifecycle بـ`ResearchLedger`: يسجل validation/submission/ack/fill/reject/cancel/disconnect/reconciliation في JSONL hash-chain؛ فشل append يمنع transition المحلي.
+- يجعل الحالة `UNKNOWN` عند الانقطاع بدلاً من افتراض outcome. reconciliation لجزء/كل fill يتطلب `VenueOrderSnapshot` بتوقيت ومقدار cumulative quantity؛ snapshot الخالي من client id لا يثبت الإلغاء.
+- `emergency_stop()` يحجب intents الجديدة؛ يُبقي UNKNOWN غير محسوم ويسجل أن reconciliation مطلوب. لا يرسل أي نداء خارجي.
 
 ## ما يتطلب خدمة خارجية وموافقة صريحة
 

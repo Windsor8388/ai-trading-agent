@@ -1,6 +1,6 @@
 # التصميم المعماري لنظام Trading Intelligence
 
-**الإصدار:** 0.3.0 · **الوضع التشغيلي الحالي:** `ANALYSIS_ONLY` محلي وبدون أي feed متصل. يوجد CSV importer وhistorical replay وPaper simulator وrisk/performance analytics محلية، لكنها لا تتصل بسوق أو وسيط.
+**الإصدار:** 0.4.0 · **الوضع التشغيلي الحالي:** `ANALYSIS_ONLY` محلي وبدون أي data feed للنظام متصل. يوجد CSV importer وhistorical replay وPaper simulator وrisk/performance analytics وexecution lifecycle محلية، لكنها لا تتصل بسوق أو وسيط. توجد لوحة static مع رسم TradingView خارجي اختياري ومعزول؛ العرض ليس data feed ولا input للمحركات.
 التصميم يفصل عمداً البحث والتحليل والورق والتنفيذ. لا يجوز اختصار هذه المسارات لمجرد أن جميعها تستخدم كلمة "signal".
 
 ## 1) المعمارية المستهدفة
@@ -128,6 +128,9 @@ NormalizedBar
 | `BacktestResult` | `backtest/engine.py` | trades، equity curve، costs، أسباب الخروج وملخص منفصل للـtrade/bar |
 | `ResearchLedger` | `research/ledger.py` | JSONL hash-chain للتنبؤ/التجربة قبل ظهور النتيجة |
 | `PaperExecutionSimulator` | `paper.py` | محاكاة محلية idempotent/kill-switch وليست venue |
+| `ExecutionPolicy` | `execution/lifecycle.py` | allowlist لـproduct specs وquantity/notional/cash-risk limits؛ لا يوافق على risk فاشل |
+| `OrderLifecycleManager` | `execution/lifecycle.py` | intent idempotency، disconnect=`UNKNOWN`، reconciliation، emergency stop؛ بلا شبكة |
+| `VenueOrderSnapshot` | `execution/lifecycle.py` | snapshot ممهور زمنيًا وcumulative quantity لحل UNKNOWN؛ لا fill بلا كمية |
 
 ### عقود واجهات المرحلة التالية
 
@@ -201,6 +204,7 @@ src/trading_intelligence/
   monitoring.py                 # freshness/incident health model; no alert transport
   signals.py                    # analysis/paper safety gate
   paper.py                      # local idempotent paper state machine; no broker
+  execution/lifecycle.py         # policy-gated, disconnected lifecycle + reconciliation state machine
   providers/contracts.py        # read-only market/calendar API contracts
   providers/csv_ohlcv.py        # strict user-supplied historical OHLCV importer
   backtest/engine.py            # next-open, stop-first historical replay
@@ -210,11 +214,15 @@ src/trading_intelligence/
   research/metrics.py           # metrics, bootstrap, temporal folds
   research/analytics.py         # DD/PF/expectancy and strategy/timeframe/session attribution
   research/ledger.py            # append-only SHA-256 experiment/prediction trail
-tests/                          # 29 local deterministic tests (current)
+tests/                          # 36 local deterministic tests (current)
 docs/
   TRADING_INTELLIGENCE_RESEARCH_AR.md
   DATA_SOURCES_AR.md
   VALIDATION_AR.md
+  EXECUTION_SAFETY_AR.md
+  DASHBOARD_AR.md
+
+dashboard/                      # static RTL control room; opt-in sandboxed third-party chart only
 ```
 
 المستهدف لاحقاً يضيف `providers/`, `normalization/`, `feature_store/`, `backtest/`, `paper/`, `execution/`, `api/`, `dashboard/`, `migrations/` و`infra/`، مع عدم وضع أسرار أو raw licensed data في Git.

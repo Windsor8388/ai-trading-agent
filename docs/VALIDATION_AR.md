@@ -8,7 +8,7 @@
 PYTHONPATH=src python -m unittest discover -s tests -v
 ```
 
-الحالات الحالية (32 اختباراً):
+الحالات الحالية (36 اختباراً):
 
 - رفض `future/unclosed` bar لمنع look-ahead.
 - رفض ICT evidence على بيانات غير صالحة.
@@ -32,7 +32,9 @@ PYTHONPATH=src python -m unittest discover -s tests -v
 - attribution للأداء وdrawdown recovery حسب strategy/timeframe/session على fixtures زمنية.
 - عقد `BarRequest` يرفض نطاقاً زمنياً غير متزايد قبل أي provider implementation.
 - Operational monitor يميز feed stale وdata-quality incident ويعيد إلى healthy بعد heartbeat/resolve.
-- execution lifecycle يحجب `ANALYSIS_ONLY`، يمنع تكرار `client_order_id`، يسجل fill/reject، يحول in-flight إلى `UNKNOWN` عند الانقطاع، ويتطلب reconciliation ويمنع intents بعد emergency stop.
+- execution lifecycle يحجب `ANALYSIS_ONLY`، ويطلب `ExecutionPolicy` صريحة للـPaper (allowlist/product spec/notional/worst-case risk)، ويمنع تكرار `client_order_id`.
+- lifecycle يسجل hash-chained audit عند ربطه بـ`ResearchLedger`، ويحّول in-flight إلى `UNKNOWN` عند الانقطاع، ويرفض fill reconciliation بلا cumulative quantity موثق، ويحافظ على UNKNOWN أثناء emergency stop حتى المصالحة.
+- dashboard contract يثبت أن وضع `ANALYSIS_ONLY` و`NO TRADE` ظاهر، وأن الرسم الخارجي opt-in داخل iframe sandbox ولا يكتب مدخلاً للمحركات، وأن security headers صالحة.
 
 هذه اختبارات سلوك برنامج وfixture اصطناعية، **وليست Backtest على السوق ولا إثبات ربحية**.
 

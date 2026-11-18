@@ -62,13 +62,14 @@
         <div class="section-heading">
           <div><p class="eyebrow">RESEARCH WORKBENCH</p><h2 id="workbench-heading">مركز التحليل والقرار</h2></div>
           <div class="tablist" role="tablist" aria-label="أقسام مركز التحليل">
-            <button class="tab active" role="tab" aria-selected="true" data-panel="analysis">التحليل</button>
-            <button class="tab" role="tab" aria-selected="false" data-panel="risk">المخاطر</button>
-            <button class="tab" role="tab" aria-selected="false" data-panel="research">التحقق</button>
+            <button class="tab active" id="analysis-tab" role="tab" aria-selected="true" aria-controls="analysis" tabindex="0" data-panel="analysis">التحليل</button>
+            <button class="tab" id="risk-tab" role="tab" aria-selected="false" aria-controls="risk" tabindex="-1" data-panel="risk">المخاطر</button>
+            <button class="tab" id="research-tab" role="tab" aria-selected="false" aria-controls="research" tabindex="-1" data-panel="research">التحقق</button>
+            <button class="tab" id="execution-tab" role="tab" aria-selected="false" aria-controls="execution" tabindex="-1" data-panel="execution">التنفيذ الورقي</button>
           </div>
         </div>
 
-        <div class="panel active" id="analysis" role="tabpanel">
+        <div class="panel active" id="analysis" role="tabpanel" aria-labelledby="analysis-tab">
           <div class="decision-card">
             <div class="decision-meta"><span>مخرج العقل المركزي</span><span>Demo snapshot · Synthetic only</span></div>
             <div class="decision-main">
@@ -87,7 +88,7 @@
           </div>
         </div>
 
-        <div class="panel" id="risk" role="tabpanel" hidden>
+        <div class="panel" id="risk" role="tabpanel" aria-labelledby="risk-tab" hidden>
           <div class="risk-layout">
             <article class="risk-card large"><p class="eyebrow">INDEPENDENT RISK GATE</p><h3>حماية رأس المال تسبق التنفيذ</h3><p>لا يستطيع أي محرك تحليل تجاوز إدارة المخاطر. تُفحص المخاطرة المالية، الوقف، RR، التعرض، الارتباط، الخسارة اليومية/الأسبوعية، التراجع، الأخبار، ومخاطر الفجوات قبل تحويل القرار إلى مرشح Paper.</p><div class="risk-chain"><span>Decision</span><b>→</b><span>PortfolioRiskBook</span><b>→</b><span>Risk Engine</span><b>→</b><span>Paper Candidate</span></div></article>
             <article class="risk-card"><span class="risk-number">01</span><h3>Position sizing</h3><p>لا يستنتج multiplier أو lot من اسم XAU/USD. يلزم product spec موثق.</p></article>
@@ -96,12 +97,27 @@
           </div>
         </div>
 
-        <div class="panel" id="research" role="tabpanel" hidden>
+        <div class="panel" id="research" role="tabpanel" aria-labelledby="research-tab" hidden>
           <div class="research-layout">
             <article class="research-card"><span class="badge">1</span><h3>فرضية مجمّدة</h3><p>rule/version/parameters/data hash قبل التشغيل.</p></article>
             <article class="research-card"><span class="badge">2</span><h3>Replay بلا مستقبل</h3><p>إشارة عند close، دخول عند next open، وstop-first للبار الغامض.</p></article>
             <article class="research-card"><span class="badge">3</span><h3>تحليل الأداء</h3><p>DD، PF، expectancy، Sharpe/Sortino، وشرائح الاستراتيجية/الإطار/الجسلة.</p></article>
             <article class="research-card"><span class="badge">4</span><h3>Ledger قابل للتدقيق</h3><p>JSONL hash-chain يسجل التوقع قبل outcome ويكشف العبث.</p></article>
+          </div>
+        </div>
+
+        <div class="panel" id="execution" role="tabpanel" aria-labelledby="execution-tab" hidden>
+          <div class="execution-layout">
+            <article class="execution-card execution-summary">
+              <p class="eyebrow">PAPER EXECUTION LIFECYCLE · LOCAL ONLY</p>
+              <h3>تنفيذ محلي مضبوط، وليس اتصالاً بوسيط</h3>
+              <p>لا يمر مرشح Paper إلى دورة الأمر إلا مع product specification وسياسة allowlist وحدود notional / worst-case risk صريحة. لا تملك هذه الصفحة صلاحية لإرسال أوامر أو حفظ مفاتيح وصول.</p>
+              <div class="execution-chain" aria-label="دورة حياة الأمر الورقي"><span>VALIDATED</span><b>←</b><span>SUBMITTED</span><b>←</b><span>ACKNOWLEDGED</span><b>←</b><span>FILL / REJECT</span><b>←</b><span>RECONCILE</span></div>
+            </article>
+            <article class="execution-card"><span class="risk-number">01</span><h3>Policy gate</h3><p>instrument allowlist، contract multiplier، minimum/step، notional وحد المخاطرة؛ لا استنتاج من الرمز.</p></article>
+            <article class="execution-card"><span class="risk-number">02</span><h3>Uncertainty is explicit</h3><p>الانقطاع ينقل الأمر إلى <code>UNKNOWN</code>. الغياب من snapshot لا يعني إلغاءه.</p></article>
+            <article class="execution-card"><span class="risk-number">03</span><h3>Audit chain</h3><p>يمكن ربط lifecycle بـ JSONL hash-chain محلي؛ فشل append يمنع transition المحلي.</p></article>
+            <article class="execution-card"><span class="risk-number">04</span><h3>Emergency stop</h3><p>يحجب intents الجديدة ويطلب إلغاء الحالة المعروفة؛ أما UNKNOWN فيحتاج reconciliation أولاً.</p></article>
           </div>
         </div>
       </section>
@@ -118,6 +134,34 @@
           <div class="flow-node"><span>04</span><b>Central intelligence</b><small>de-correlation + NO TRADE</small></div>
           <div class="flow-arrow">←</div>
           <div class="flow-node accent"><span>05</span><b>Risk / paper gate</b><small>never live by default</small></div>
+        </div>
+      </section>
+
+      <section class="chart-lab" aria-labelledby="chart-heading">
+        <div class="section-heading"><div><p class="eyebrow">EXTERNAL VISUALIZATION BOUNDARY</p><h2 id="chart-heading">مساحة الرسم البياني المنفصلة</h2></div><p class="section-note">عرض خارجي اختياري، لا يصبح مدخلاً للمحركات أو إدارة المخاطر.</p></div>
+        <div class="chart-lab-grid">
+          <article class="chart-policy-card">
+            <span class="boundary-pill">NO ENGINE INPUT</span>
+            <h3>بيانات الرسم ليست عقد بيانات النظام</h3>
+            <p>أُضيفت أداة العرض من الملف المرفق كـ TradingView widget معزول. لا يبدأ تحميلها إلا بعد الضغط، ولا تُقرأ أسعارها في Python أو تُحوّل إلى إشارة، ولا تثبت جودة المصدر أو توقيته.</p>
+            <ul>
+              <li>XAU/USD وGC خياران منفصلان بوضوح.</li>
+              <li>لا حساب، لا API key، ولا إرسال أمر.</li>
+              <li>افحص الترخيص والتأخير والمصدر قبل أي استخدام بحثي.</li>
+            </ul>
+            <label class="field-label" for="chart-symbol">رمز العرض الخارجي</label>
+            <select id="chart-symbol" class="chart-select">
+              <option value="OANDA:XAUUSD">XAU/USD · OANDA</option>
+              <option value="COMEX:GC1!">GC continuous · COMEX</option>
+              <option value="FX:EURUSD">EUR/USD · مثال الملف المرفق</option>
+            </select>
+            <div class="chart-actions"><button class="primary-button" id="load-chart" type="button">تحميل الرسم الخارجي <span>←</span></button><button class="ghost-button" id="unload-chart" type="button" disabled>إزالة الرسم</button></div>
+            <p id="chart-status" class="chart-status" role="status" aria-live="polite">لم يُحمّل أي مصدر خارجي بعد.</p>
+          </article>
+          <div class="chart-shell">
+            <div class="chart-placeholder" id="chart-placeholder"><span>EXTERNAL CHART · OPT-IN</span><b>الرسم الخارجي متوقف</b><p>اضغط «تحميل الرسم الخارجي» لإرسال طلب العرض إلى TradingView داخل iframe معزول.</p></div>
+            <iframe id="external-chart" title="رسم TradingView خارجي معزول" src="about:blank" sandbox="allow-scripts allow-forms allow-popups" referrerpolicy="no-referrer" loading="lazy" hidden></iframe>
+          </div>
         </div>
       </section>
 
