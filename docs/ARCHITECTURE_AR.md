@@ -154,7 +154,7 @@ class ExecutionVenue(Protocol):
 
 ## 4) المحركات واستقلال المسؤولية
 
-| المحرك | ما يملكه | ما لا يملكه | حالة v0.3 |
+| المحرك | ما يملكه | ما لا يملكه | حالة v0.4 |
 |---|---|---|---|
 | ICT | FVG وequal-high/low sweep heuristics بإصدار | تعريف SMC أو دليل order book | منفذ تجريبي |
 | SMC | structure + displacement/order-block proxy | تنفيذ ICT أو sizing | منفذ تجريبي |
