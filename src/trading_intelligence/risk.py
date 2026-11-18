@@ -1,0 +1,51 @@
+"""Capital-protection gate, intentionally independent from directional engines."""
+from __future__ import annotations
+
+from math import floor
+
+from .models import DecisionAction, InstrumentRiskSpec, PortfolioState, ProposedLevels, RiskAssessment, RiskLimits
+
+
+class RiskManagementEngine:
+    version = "0.1.0"
+
+    def __init__(self, limits: RiskLimits | None = None) -> None:
+        self.limits = limits or RiskLimits()
+
+    def assess(self, action: DecisionAction, levels: ProposedLevels | None, portfolio: PortfolioState, spec: InstrumentRiskSpec | None) -> RiskAssessment:
+        reasons: list[str] = []
+        if action not in (DecisionAction.BUY, DecisionAction.SELL):
+            return RiskAssessment(False, None, None, ("No directional decision to size.",))
+        if levels is None:
+            return RiskAssessment(False, None, None, ("Entry, stop, and target levels are required before sizing.",))
+        if spec is None:
+            return RiskAssessment(False, None, None, ("Broker/product-specific contract multiplier is required; it is never inferred.",))
+        if portfolio.equity <= 0:
+            return RiskAssessment(False, None, None, ("Equity must be positive.",))
+        if (action == DecisionAction.BUY and levels.stop_loss >= levels.entry) or (action == DecisionAction.SELL and levels.stop_loss <= levels.entry):
+            return RiskAssessment(False, None, None, ("Stop-loss is on the wrong side of entry.",))
+        if not levels.targets:
+            return RiskAssessment(False, None, None, ("At least one target is required to evaluate reward/risk.",))
+        stop_distance = abs(levels.entry - levels.stop_loss)
+        reward = (levels.targets[0] - levels.entry) if action == DecisionAction.BUY else (levels.entry - levels.targets[0])
+        if reward <= 0:
+            return RiskAssessment(False, None, None, ("First target is not on the reward side of entry.",))
+        reward_to_risk = reward / stop_distance
+        if portfolio.realized_daily_loss >= portfolio.equity * self.limits.daily_loss_fraction:
+            reasons.append("Daily loss limit reached; trading is stopped.")
+        if portfolio.realized_weekly_loss >= portfolio.equity * self.limits.weekly_loss_fraction:
+            reasons.append("Weekly loss limit reached; trading is stopped.")
+        if portfolio.drawdown_fraction >= self.limits.max_drawdown_fraction:
+            reasons.append("Maximum drawdown limit reached; trading is stopped.")
+        if portfolio.open_positions >= self.limits.max_open_positions:
+            reasons.append("Maximum open-position count reached.")
+        if portfolio.correlated_open_positions >= self.limits.max_correlated_positions:
+            reasons.append("Correlated-position limit reached.")
+        if reasons:
+            return RiskAssessment(False, None, None, tuple(reasons))
+        cash_risk = portfolio.equity * self.limits.risk_per_trade_fraction
+        raw_quantity = cash_risk / (stop_distance * spec.contract_multiplier)
+        quantity = floor(raw_quantity / spec.quantity_step) * spec.quantity_step
+        if quantity < spec.minimum_quantity:
+            return RiskAssessment(False, None, cash_risk, ("Risk budget is too small for the instrument minimum quantity.",))
+        return RiskAssessment(True, quantity, cash_risk, (f"Sized at <= {self.limits.risk_per_trade_fraction:.2%} equity risk before costs/slippage.",), reward_to_risk)

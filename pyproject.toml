@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "trading-intelligence"
+version = "0.1.0"
+description = "Auditable, analysis-first multi-school trading intelligence prototype"
+requires-python = ">=3.11"
+readme = "docs/ARCHITECTURE_AR.md"
+license = {text = "MIT"}
+authors = [{name = "AI Trader MCP contributors"}]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+]
+
+[project.scripts]
+trading-intelligence = "trading_intelligence.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+trading_intelligence = ["knowledge_data/*.json"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

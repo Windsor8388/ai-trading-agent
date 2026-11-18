@@ -24,6 +24,8 @@ The agent-native skills directory for **Trader Dev MCP** — write Pine Script, 
 
 > ⚠️ **Research and education only.** AI Trader MCP does not place real trades, send real orders, or guarantee profits. Backtests are not future performance. Crypto trading is risky and leverage can cause catastrophic losses. Read [docs/DISCLAIMER.md](docs/DISCLAIMER.md) before doing anything.
 
+> 🧪 **New: analysis-first multi-school prototype.** The repository now also contains a local, auditable Python foundation for a future multi-school trading-intelligence system. It has no live data connection, broker credentials, order routing, or market backtest results. Start with the Arabic [research study](docs/TRADING_INTELLIGENCE_RESEARCH_AR.md), [architecture](docs/ARCHITECTURE_AR.md), [data-source plan](docs/DATA_SOURCES_AR.md), and [validation criteria](docs/VALIDATION_AR.md). Run its deterministic tests with `PYTHONPATH=src python -m unittest discover -s tests -v`.
+
 ---
 
 <div align="center">
