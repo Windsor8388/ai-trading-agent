@@ -232,7 +232,7 @@ docs/
 | 7. backtest | event-driven next-open fills/cost/stop-first replay **(منفذ محلياً)**؛ roll/tick model لاحقاً | benchmark known fixtures + no-lookahead audits |
 | 8. paper | append-only hash ledger + in-memory idempotent paper simulator **(منفذ محلياً)** | reconciliation وفترة forward precommitted |
 | 9. improvement | locked experiment registry + model gates | final OOS untouched + drift monitoring |
-| 10. live study | venue adapter + human approval | disaster drills, security review, explicit user approval؛ لا auto-go-live |
+| 10. live study | venue adapter + human approval؛ يوجد الآن lifecycle محلي يمنع live ويغطي validation/idempotency/reject/disconnect/reconcile/kill state | disaster drills, security review، explicit user approval، venue reconciliation؛ لا auto-go-live |
 
 ## 8) التنفيذ الحقيقي: تصميم مؤجل ومقيد
 

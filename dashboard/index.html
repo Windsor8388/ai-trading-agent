@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="لوحة تحكم بحثية لنظام ذكاء تداول متعدد المدارس، تعمل في وضع التحليل فقط." />
+    <meta name="theme-color" content="#09131f" />
+    <title>Trading Intelligence Control Room</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">انتقل إلى المحتوى</a>
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+
+    <header class="site-header shell">
+      <div class="brand" aria-label="Trading Intelligence">
+        <div class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div>
+          <p class="eyebrow">AUTONOMOUS RESEARCH PLATFORM</p>
+          <h1>Trading Intelligence</h1>
+        </div>
+      </div>
+      <div class="header-actions">
+        <span class="mode-pill"><i></i> وضع التحليل فقط</span>
+        <button class="ghost-button" id="safety-check" type="button">فحص الأمان</button>
+      </div>
+    </header>
+
+    <main id="main" class="shell">
+      <section class="hero" aria-labelledby="hero-heading">
+        <div class="hero-copy">
+          <p class="eyebrow">SYSTEM CONTROL ROOM · V0.3</p>
+          <h2 id="hero-heading">عقل بحثي متعدد المدارس،<br /><em>لا يتداول قبل أن يثبت.</em></h2>
+          <p class="hero-text">منصة بحث وتحليل قابلة للتدقيق تجمع مدارس السوق، تفصل الأدلة المترابطة، وتضع حماية رأس المال فوق أي إشارة. هذه الواجهة تعرض حالة النموذج الأولي المحلي فقط — لا يوجد مزود أسعار حي أو وسيط متصل.</p>
+          <div class="hero-actions">
+            <a class="primary-button" href="#workbench">استكشف مركز التحليل <span>←</span></a>
+            <a class="text-button" href="#lifecycle">مسار الترقية الآمن <span>↓</span></a>
+          </div>
+        </div>
+        <aside class="command-card" aria-label="حالة المنصة">
+          <div class="command-head"><span>حالة التشغيل</span><span class="live-dot">OFFLINE</span></div>
+          <div class="mode-title">ANALYSIS_ONLY</div>
+          <div class="command-grid">
+            <div><span>البيانات الحية</span><strong>غير متصلة</strong></div>
+            <div><span>تنفيذ الوسيط</span><strong>محظور</strong></div>
+            <div><span>حالة المخاطر</span><strong>محمي</strong></div>
+            <div><span>قرار العرض</span><strong>NO TRADE</strong></div>
+          </div>
+          <p class="command-note">لا تُنشئ الواجهة توصية، أمراً، أو اتصالاً بسوق. كل حالة حيّة تتطلب مصدر بيانات موثقاً وموافقة بشرية.</p>
+        </aside>
+      </section>
+
+      <section class="status-strip" aria-label="ضمانات النظام">
+        <div class="status-item"><span class="status-icon">01</span><div><b>Evidence-first</b><small>الأدلة قبل القرار</small></div></div>
+        <div class="status-item"><span class="status-icon">02</span><div><b>No look-ahead</b><small>لقطات زمنية منضبطة</small></div></div>
+        <div class="status-item"><span class="status-icon">03</span><div><b>Risk-gated</b><small>حدود مستقلة وقابلة للتدقيق</small></div></div>
+        <div class="status-item"><span class="status-icon">04</span><div><b>Human approval</b><small>لا تنفيذ فعلي تلقائي</small></div></div>
+      </section>
+
+      <section id="workbench" class="workbench" aria-labelledby="workbench-heading">
+        <div class="section-heading">
+          <div><p class="eyebrow">RESEARCH WORKBENCH</p><h2 id="workbench-heading">مركز التحليل والقرار</h2></div>
+          <div class="tablist" role="tablist" aria-label="أقسام مركز التحليل">
+            <button class="tab active" role="tab" aria-selected="true" data-panel="analysis">التحليل</button>
+            <button class="tab" role="tab" aria-selected="false" data-panel="risk">المخاطر</button>
+            <button class="tab" role="tab" aria-selected="false" data-panel="research">التحقق</button>
+          </div>
+        </div>
+
+        <div class="panel active" id="analysis" role="tabpanel">
+          <div class="decision-card">
+            <div class="decision-meta"><span>مخرج العقل المركزي</span><span>Demo snapshot · Synthetic only</span></div>
+            <div class="decision-main">
+              <div><p>القرار الحالي</p><h3>NO TRADE</h3><span class="subtle">لا توجد مجموعتان مستقلتان من الأدلة المؤيدة</span></div>
+              <div class="confidence"><svg viewBox="0 0 36 36" aria-hidden="true"><path class="ring-base" d="M18 2.5a15.5 15.5 0 1 1 0 31a15.5 15.5 0 1 1 0-31"/><path class="ring-value" d="M18 2.5a15.5 15.5 0 1 1 0 31a15.5 15.5 0 1 1 0-31"/></svg><b>50%</b><small>ثقة تحليلية<br />وليست احتمال ربح</small></div>
+            </div>
+            <div class="decision-reasons"><span>السبب</span><p>المحرك الكمي أعطى ميل شراء تجريبي، لكن بنية السعر والحجم لم يوفرا توافقاً مستقلاً. سياسة المركز ترفض تضخيم الأدلة المتداخلة بين ICT وSMC وPrice Action.</p></div>
+          </div>
+          <div class="engine-grid">
+            <article class="engine-card signal-neutral"><div class="engine-top"><span>PRICE ACTION</span><i>مراقبة</i></div><h3>هيكل السوق</h3><p>pivots مؤكدة، HH/HL وLH/LL، وإبطال واضح.</p><div class="meter"><span style="width:20%"></span></div><small>Market structure group</small></article>
+            <article class="engine-card signal-neutral"><div class="engine-top"><span>ICT</span><i>مراقبة</i></div><h3>السيولة وFVG</h3><p>Fair Value Gap وequal-high/low sweep بصياغة قابلة للاختبار.</p><div class="meter"><span style="width:10%"></span></div><small>Correlated structure evidence</small></article>
+            <article class="engine-card signal-neutral"><div class="engine-top"><span>SMC</span><i>مراقبة</i></div><h3>Order Block proxy</h3><p>Structure + displacement مع شروط إبطال مستقلة.</p><div class="meter"><span style="width:15%"></span></div><small>Correlated structure evidence</small></article>
+            <article class="engine-card signal-buy"><div class="engine-top"><span>QUANT</span><i>مرصود</i></div><h3>اتجاه/تقلب</h3><p>SMA 20/50 مع بوابة تقلب شفافة وخط أساس قابل للمقارنة.</p><div class="meter"><span style="width:50%"></span></div><small>Statistical trend group</small></article>
+            <article class="engine-card signal-neutral"><div class="engine-top"><span>VOLUME</span><i>معلق</i></div><h3>تأكيد الحجم</h3><p>لا يصدر حكماً إن كانت دلالة الحجم غير موثقة.</p><div class="meter"><span style="width:10%"></span></div><small>Requires volume semantics</small></article>
+            <article class="engine-card signal-blocked"><div class="engine-top"><span>ORDER FLOW</span><i>محجوب</i></div><h3>Delta / CVD / Footprint</h3><p>يتطلب tick trades وquotes أو L2 حقيقياً، وليس OHLCV.</p><div class="meter"><span style="width:0%"></span></div><small>Provider required</small></article>
+          </div>
+        </div>
+
+        <div class="panel" id="risk" role="tabpanel" hidden>
+          <div class="risk-layout">
+            <article class="risk-card large"><p class="eyebrow">INDEPENDENT RISK GATE</p><h3>حماية رأس المال تسبق التنفيذ</h3><p>لا يستطيع أي محرك تحليل تجاوز إدارة المخاطر. تُفحص المخاطرة المالية، الوقف، RR، التعرض، الارتباط، الخسارة اليومية/الأسبوعية، التراجع، الأخبار، ومخاطر الفجوات قبل تحويل القرار إلى مرشح Paper.</p><div class="risk-chain"><span>Decision</span><b>→</b><span>PortfolioRiskBook</span><b>→</b><span>Risk Engine</span><b>→</b><span>Paper Candidate</span></div></article>
+            <article class="risk-card"><span class="risk-number">01</span><h3>Position sizing</h3><p>لا يستنتج multiplier أو lot من اسم XAU/USD. يلزم product spec موثق.</p></article>
+            <article class="risk-card"><span class="risk-number">02</span><h3>Gap & event gates</h3><p>event-risk وgap-risk embargo يحجبان إدخالات جديدة.</p></article>
+            <article class="risk-card"><span class="risk-number">03</span><h3>Circuit breakers</h3><p>حدود خسارة، تراجع، خسائر متتالية، exposure، ومراكز مترابطة.</p></article>
+          </div>
+        </div>
+
+        <div class="panel" id="research" role="tabpanel" hidden>
+          <div class="research-layout">
+            <article class="research-card"><span class="badge">1</span><h3>فرضية مجمّدة</h3><p>rule/version/parameters/data hash قبل التشغيل.</p></article>
+            <article class="research-card"><span class="badge">2</span><h3>Replay بلا مستقبل</h3><p>إشارة عند close، دخول عند next open، وstop-first للبار الغامض.</p></article>
+            <article class="research-card"><span class="badge">3</span><h3>تحليل الأداء</h3><p>DD، PF، expectancy، Sharpe/Sortino، وشرائح الاستراتيجية/الإطار/الجسلة.</p></article>
+            <article class="research-card"><span class="badge">4</span><h3>Ledger قابل للتدقيق</h3><p>JSONL hash-chain يسجل التوقع قبل outcome ويكشف العبث.</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="architecture-section" aria-labelledby="architecture-heading">
+        <div class="section-heading"><div><p class="eyebrow">CONTROLLED DATA FLOW</p><h2 id="architecture-heading">من البيانات إلى قرار قابل للتفسير</h2></div><p class="section-note">كل سهم هو بوابة تحقق، وليس مساراً مباشراً لأمر تداول.</p></div>
+        <div class="architecture-flow">
+          <div class="flow-node"><span>01</span><b>Data contract</b><small>هوية الأداة · UTC · quality</small></div>
+          <div class="flow-arrow">←</div>
+          <div class="flow-node"><span>02</span><b>Market snapshot</b><small>completed bars ≤ as_of</small></div>
+          <div class="flow-arrow">←</div>
+          <div class="flow-node"><span>03</span><b>Independent engines</b><small>evidence + invalidation</small></div>
+          <div class="flow-arrow">←</div>
+          <div class="flow-node"><span>04</span><b>Central intelligence</b><small>de-correlation + NO TRADE</small></div>
+          <div class="flow-arrow">←</div>
+          <div class="flow-node accent"><span>05</span><b>Risk / paper gate</b><small>never live by default</small></div>
+        </div>
+      </section>
+
+      <section id="lifecycle" class="lifecycle" aria-labelledby="lifecycle-heading">
+        <div class="section-heading"><div><p class="eyebrow">PROMOTION LIFECYCLE</p><h2 id="lifecycle-heading">الترقية لا تحدث بالقفز فوق الاختبارات</h2></div></div>
+        <ol class="lifecycle-list">
+          <li class="done"><span>01</span><div><b>Analysis only</b><small>معرفة، محركات، أدلة، وNO TRADE.</small></div></li>
+          <li class="done"><span>02</span><div><b>Historical replay</b><small>لقطات زمنية، تكاليف، ونتائج قابلة لإعادة التشغيل.</small></div></li>
+          <li class="current"><span>03</span><div><b>Paper simulation</b><small>idempotency، kill switch، وسجل outcomes قبل أي broker.</small></div></li>
+          <li><span>04</span><div><b>Forward paper feed</b><small>يتطلب مصدر بيانات موثوقاً، reconciliation ومراقبة drift.</small></div></li>
+          <li><span>05</span><div><b>Live study</b><small>يتطلب موافقة بشرية، حساب منفصل، API موثق وdisaster drills.</small></div></li>
+        </ol>
+      </section>
+
+      <section class="integration-grid" aria-labelledby="integration-heading">
+        <article><p class="eyebrow">BUILD NOW</p><h2 id="integration-heading">المكوّنات المتاحة محلياً</h2><ul><li>Knowledge Base بإصدار ومصادر</li><li>محركات تحليل مستقلة</li><li>CSV historical ingestion + manifest</li><li>Backtest وanalytics وRiskBook</li><li>Paper simulator وhash ledger</li></ul></article>
+        <article class="requires"><p class="eyebrow">REQUIRES EXTERNAL SERVICES</p><h2>قبل البيانات الحية أو التنفيذ</h2><ul><li>مزود XAU/USD أو GC مرخّص</li><li>contract specs وbid/ask/calendar</li><li>مخزن دائم وRBAC وaudit</li><li>تقويم أخبار / L2 / tick data عند الحاجة</li><li>موافقة صريحة قبل أي broker API</li></ul></article>
+      </section>
+    </main>
+
+    <footer class="shell site-footer"><span>Trading Intelligence · Research control room</span><span>لا نصيحة مالية · لا اتصال سوقي · لا تنفيذ حي</span></footer>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script src="app.js"></script>
+  </body>
+</html>
