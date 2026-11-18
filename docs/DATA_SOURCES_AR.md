@@ -124,3 +124,19 @@ flowchart TD
 أضيف `providers/csv_ohlcv.py` كجسر آمن لملف تاريخي يقدمه المستخدم أو مزود مرخّص. هو **ليس API ولا اتصالاً بالسوق**. يفرض CSV ISO-8601 + OHLC (+ volume اختياري)، يحول الوقت إلى UTC، يرفض أي صف معيب أو duplicate/out-of-order، ويُنتج `DatasetManifest` فيه SHA-256 للملف وparser version وquality report و`FeedMetadata` بنمط `HISTORICAL`.
 
 يوجد أيضاً `resample_intraday_bars`، لكنه لا يملأ bars مفقودة ولا ينشئ D1/W1/MN، لأن تلك تحتاج daily alignment/session policy من المزود. تفاصيل replay واستخدام الملف في experiment موجودة في [`BACKTEST_AND_PAPER_AR.md`](BACKTEST_AND_PAPER_AR.md).
+
+## 9) واجهات التكامل ومصادر البيانات المطلوبة حسب الوظيفة
+
+تمت إضافة عقود Python read-only في `providers/contracts.py`: `BarRequest`، `MarketDataResponse`، `MarketDataProvider`، `EconomicEvent` و`EconomicCalendarProvider`. لا توجد implementation شبكية أو credentials؛ هذا فصل مقصود بين العقد ومزود البيانات.
+
+| الوظيفة | مصادر/واجهات مرشحة | الحد الأدنى الذي يجب أن يوفره المصدر | شرط قبل الاعتماد |
+|---|---|---|---|
+| XAU/USD historical/streaming | API وسيط منظم أو OANDA REST-v20 عند توفر الأداة للحساب | BID/ASK/MID معلن، complete bars، UTC، historical/live segment | اختبار reconciliation وحقوق الاستخدام؛ لا تعني الوثائق أن الرمز متاح للحساب |
+| GC futures | CME-licensed feed أو مزود بيانات مرخّص/وسيط يقدم COMEX | عقد/expiry، trade volume، session، roll/OI metadata | entitlement/licence وcontract identity؛ لا series مستمر بلا roll policy |
+| L1/L2/trades | feed تداول مرخّص للـvenue | sequence، quote/trade timestamps، depth، recovery | مطلوب لـdelta/CVD/footprint؛ OHLC غير بديل |
+| calendar/macros | calendar مرخّص أو إصدارات الجهات الرسمية مثل FRED/BLS/BEA حيث يناسب | scheduled/published UTC، actual/consensus/prior/revisions/vintage | حفظ source وrevision؛ event embargo عند العطل |
+| news/NLP | مزود أخبار مرخّص | publish/received UTC، source/license، duplicate/revision IDs | latency/rights/entity policy قبل أي feature |
+| persistence/metadata | PostgreSQL؛ Supabase خيار managed لاحق | migrations، RLS، audit metadata، no raw payload secrets | لا اتصال مُنشأ في هذا المستودع |
+| dashboard hosting | React API client؛ Vercel خيار hosting لاحق | CSP/auth/RBAC، relative API URLs، no client secrets | لا نشر أو integration مُنشأ حالياً |
+
+مراجع OANDA وCME الموجودة في [`knowledge/sources.json`](../knowledge/sources.json) تثبت شكل product/API المعروض في وثائقها فقط. لا تثبت ملاءمة مصدر بعينه، تسعيره، ترخيصه، توفره في منطقة المستخدم، أو وجود بيانات حية.

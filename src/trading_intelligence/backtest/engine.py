@@ -56,6 +56,7 @@ class BacktestInstruction:
 @dataclass(frozen=True, slots=True)
 class BacktestTrade:
     strategy_id: str
+    timeframe: str
     action: DecisionAction
     signal_time: datetime
     entry_time: datetime
@@ -215,7 +216,7 @@ class BacktestEngine:
             net = gross - costs
             cash += gross - exit_fee  # Entry fee was debited at entry.
             trades.append(BacktestTrade(
-                position.strategy_id, position.action, position.signal_time, position.entry_time, candle.close_time,
+                position.strategy_id, timeframe, position.action, position.signal_time, position.entry_time, candle.close_time,
                 position.entry_price, exit_price, position.stop_loss, position.target, self.config.quantity, reason,
                 gross, costs, net, net / position.equity_before_entry, index - position.entry_index + 1,
                 position.maximum_favorable_excursion, position.maximum_adverse_excursion,

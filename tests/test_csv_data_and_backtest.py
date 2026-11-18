@@ -9,7 +9,7 @@ from pathlib import Path
 from trading_intelligence.backtest import BacktestConfig, BacktestEngine, BacktestInstruction
 from trading_intelligence.data import resample_intraday_bars
 from trading_intelligence.models import Candle, DataMode, DecisionAction, FeedMetadata, MarketSnapshot, ProposedLevels
-from trading_intelligence.providers import CSVBarSpec, import_ohlcv_csv
+from trading_intelligence.providers import BarRequest, CSVBarSpec, import_ohlcv_csv
 
 
 START = datetime(2025, 1, 1, tzinfo=timezone.utc)
@@ -24,6 +24,10 @@ def feed() -> FeedMetadata:
 
 
 class CSVDataAndBacktestTests(unittest.TestCase):
+    def test_provider_bar_contract_rejects_time_travel(self) -> None:
+        with self.assertRaises(ValueError):
+            BarRequest("XAUUSD", "H1", START, START, "MID")
+
     def test_csv_import_is_fingerprinted_and_normalized_to_utc(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "bars.csv"

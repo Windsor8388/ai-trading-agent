@@ -8,7 +8,7 @@
 PYTHONPATH=src python -m unittest discover -s tests -v
 ```
 
-الحالات الحالية (24 اختباراً):
+الحالات الحالية (29 اختباراً):
 
 - رفض `future/unclosed` bar لمنع look-ahead.
 - رفض ICT evidence على بيانات غير صالحة.
@@ -27,6 +27,11 @@ PYTHONPATH=src python -m unittest discover -s tests -v
 - سلسلة Ledger hash-chain سليمة وتكتشف تعديل payload.
 - Paper simulator يثبت idempotency وkill switch وexit الورقي المحافظ.
 - circuit breakers لمتتاليات الخسارة وevent-risk embargo.
+- `PortfolioRiskBook`: خسائر محققة UTC يومياً/أسبوعياً، drawdown، exposure، وتركيز correlation group.
+- gap-buffered sizing وgap-risk embargo لا يتجاوزان Risk Management Engine.
+- attribution للأداء وdrawdown recovery حسب strategy/timeframe/session على fixtures زمنية.
+- عقد `BarRequest` يرفض نطاقاً زمنياً غير متزايد قبل أي provider implementation.
+- Operational monitor يميز feed stale وdata-quality incident ويعيد إلى healthy بعد heartbeat/resolve.
 
 هذه اختبارات سلوك برنامج وfixture اصطناعية، **وليست Backtest على السوق ولا إثبات ربحية**.
 

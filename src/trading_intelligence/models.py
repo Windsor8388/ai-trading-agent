@@ -171,6 +171,10 @@ class InstrumentRiskSpec:
     quantity_step: float
     currency: str = "USD"
 
+    def __post_init__(self) -> None:
+        if not self.symbol or self.contract_multiplier <= 0 or self.minimum_quantity <= 0 or self.quantity_step <= 0:
+            raise ValueError("Instrument risk specification requires positive multiplier, minimum quantity, and step.")
+
 
 @dataclass(frozen=True, slots=True)
 class PortfolioState:
@@ -183,6 +187,7 @@ class PortfolioState:
     consecutive_losses: int = 0
     gross_exposure_fraction: float = 0.0
     event_risk_active: bool = False
+    gap_risk_active: bool = False
 
 
 @dataclass(frozen=True, slots=True)
@@ -196,6 +201,16 @@ class RiskLimits:
     min_reward_to_risk: float = 1.0
     max_consecutive_losses: int = 3
     max_gross_exposure_fraction: float = 1.0
+    gap_buffer_fraction: float = 0.0
+
+    def __post_init__(self) -> None:
+        fractions = (self.risk_per_trade_fraction, self.daily_loss_fraction, self.weekly_loss_fraction, self.max_drawdown_fraction, self.max_gross_exposure_fraction, self.gap_buffer_fraction)
+        if any(value < 0 for value in fractions):
+            raise ValueError("Risk-limit fractions cannot be negative.")
+        if self.max_open_positions < 1 or self.max_correlated_positions < 0 or self.max_consecutive_losses < 1:
+            raise ValueError("Risk count limits must be positive (correlated positions may be zero).")
+        if self.min_reward_to_risk <= 0:
+            raise ValueError("Minimum reward/risk must be positive.")
 
 
 @dataclass(frozen=True, slots=True)
@@ -205,6 +220,8 @@ class RiskAssessment:
     max_cash_risk: float | None
     reasons: Sequence[str]
     reward_to_risk: float | None = None
+    risk_per_unit: float | None = None
+    worst_case_cash_risk: float | None = None
 
 
 @dataclass(frozen=True, slots=True)

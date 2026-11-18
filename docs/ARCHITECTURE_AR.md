@@ -1,6 +1,6 @@
 # التصميم المعماري لنظام Trading Intelligence
 
-**الإصدار:** 0.1.0 · **الوضع التشغيلي الحالي:** `ANALYSIS_ONLY` محلي وبدون أي feed متصل.
+**الإصدار:** 0.3.0 · **الوضع التشغيلي الحالي:** `ANALYSIS_ONLY` محلي وبدون أي feed متصل. يوجد CSV importer وhistorical replay وPaper simulator وrisk/performance analytics محلية، لكنها لا تتصل بسوق أو وسيط.
 التصميم يفصل عمداً البحث والتحليل والورق والتنفيذ. لا يجوز اختصار هذه المسارات لمجرد أن جميعها تستخدم كلمة "signal".
 
 ## 1) المعمارية المستهدفة
@@ -151,7 +151,7 @@ class ExecutionVenue(Protocol):
 
 ## 4) المحركات واستقلال المسؤولية
 
-| المحرك | ما يملكه | ما لا يملكه | حالة v0.1 |
+| المحرك | ما يملكه | ما لا يملكه | حالة v0.3 |
 |---|---|---|---|
 | ICT | FVG وequal-high/low sweep heuristics بإصدار | تعريف SMC أو دليل order book | منفذ تجريبي |
 | SMC | structure + displacement/order-block proxy | تنفيذ ICT أو sizing | منفذ تجريبي |
@@ -196,13 +196,21 @@ src/trading_intelligence/
   knowledge_data/               # packaged mirror of the canonical registry
   orchestration.py              # independent multi-TF engine runner
   central.py                    # evidence de-correlation/NO_TRADE
-  risk.py                       # capital protection and sizing
+  risk.py                       # independent limits, gap-buffered sizing, embargo gates
+  risk_book.py                  # local realized-loss/DD/exposure/correlation state
+  monitoring.py                 # freshness/incident health model; no alert transport
   signals.py                    # analysis/paper safety gate
+  paper.py                      # local idempotent paper state machine; no broker
+  providers/contracts.py        # read-only market/calendar API contracts
+  providers/csv_ohlcv.py        # strict user-supplied historical OHLCV importer
+  backtest/engine.py            # next-open, stop-first historical replay
   engines/
     indicators.py               # transparent no-lookahead primitives
     technical.py                # first independent engines
   research/metrics.py           # metrics, bootstrap, temporal folds
-tests/                          # 24 local deterministic tests (current)
+  research/analytics.py         # DD/PF/expectancy and strategy/timeframe/session attribution
+  research/ledger.py            # append-only SHA-256 experiment/prediction trail
+tests/                          # 29 local deterministic tests (current)
 docs/
   TRADING_INTELLIGENCE_RESEARCH_AR.md
   DATA_SOURCES_AR.md
@@ -229,3 +237,128 @@ docs/
 ## 8) التنفيذ الحقيقي: تصميم مؤجل ومقيد
 
 قبل أي دراسة live، يطلب النظام: حساب مخصص، صلاحيات أقل ما يمكن، idempotency key، order validation، max notional، kill switch، reconciliation عند إعادة الاتصال، event log غير قابل للمحو، وموافقة بشرية لكل تفعيل. ليس في المشروع كود يتصل بوسيط أو يستخدم credentials، وبناءً على طلب المستخدم لا يجب إضافته أو تشغيله من دون موافقة صريحة لاحقة.
+
+## 9) المسارات التشغيلية التفصيلية: البيانات، المخاطر، الاختبار، والمراقبة
+
+```mermaid
+flowchart TD
+    P[Vendor/API or user CSV] --> R[Raw payload + request metadata]
+    R --> M[Manifest SHA-256 + immutable storage]
+    M --> Q{Data QA
+    schema / UTC / complete / gap / identity}
+    Q -->|fail| I[Quality incident + quarantine + NO TRADE]
+    Q -->|pass| S[Point-in-time snapshot]
+    S --> E[School engines]
+    E --> C[Central decision + evidence de-correlation]
+    C --> RB[PortfolioRiskBook]
+    RB --> RM[RiskManagementEngine]
+    RM -->|blocked| L[Ledger + dashboard explanation]
+    RM -->|paper candidate| PS[Paper simulator]
+    S --> BT[Historical replay]
+    BT --> PA[PerformanceAnalyzer
+    DD / PF / expectancy / Sharpe / Sortino
+    strategy / timeframe / session]
+    PA --> L
+    PS --> L
+    L --> MON[Monitoring / alerts / read models]
+```
+
+### Risk model وواجهته
+
+```text
+PortfolioRiskBook (local PoC; durable event store in production)
+  initial_equity, high_water_mark, realized pnl events, open positions
+  UTC daily/weekly net realised loss
+  drawdown, gross exposure, correlation concentration, consecutive losses
+
+OpenRiskPosition
+  position_id, instrument, correlation_group, gross_notional, opened_at
+
+PortfolioState -> RiskManagementEngine.assess(...)
+  equity, daily/weekly loss, drawdown, open/correlated positions,
+  exposure, event_risk_active, gap_risk_active
+
+RiskAssessment
+  approval, quantity, planned cash risk, gap-buffered risk/unit,
+  worst-case cash risk, reward/risk, machine-readable reasons
+```
+
+`PortfolioRiskBook` منفذ محلياً لاختبار الحسابات؛ لا يحل محل مصدر أرصدة/مراكز موثوق أو reconciliation مع وسيط. الخسارة اليومية/الأسبوعية في النسخة الحالية هي **صافي P&L محقق** ضمن يوم/أسبوع UTC، وهو convention معلن يجب أن يطابق policy المؤسسة قبل الاستخدام الحقيقي.
+
+### التحليلات والـread models
+
+```text
+BacktestTrade / Paper trade
+  strategy_id, timeframe, entry/exit UTC, costs, net PnL,
+  return_on_equity, MFE/MAE, bars_held, exit reason
+
+EquityPoint
+  time UTC, equity
+
+PerformanceAnalyzer
+  overall + by_strategy + by_timeframe + by_session
+  profit factor, expectancy, win rate, compound return,
+  optional documented annualized Sharpe/Sortino, drawdown episodes
+```
+
+الجلسات الافتراضية تسميات UTC عامة فقط (`ASIA_UTC`, `LONDON_UTC`, `NEW_YORK_UTC`, `OFF_SESSION_UTC`). لا تمثل ساعات بورصة أو DST؛ يمرر adapter تقويم/جلسات المنتج الحقيقي قبل إنتاج تقرير رسمي.
+
+## 10) API ولوحة التحكم والمراقبة — تصميم قبل البناء
+
+لا توجد خدمة API أو واجهة منشورة في هذا الفرع. هذا عقد البناء المقترح، وليس ادعاء اتصال بـSupabase أو Vercel.
+
+```mermaid
+flowchart LR
+    U[Researcher / reviewer] --> UI[React/TypeScript dashboard]
+    UI --> API[FastAPI / typed REST or OpenAPI]
+    API --> DB[(PostgreSQL / optional Supabase)]
+    API --> OBJ[Object storage: raw manifests, reports]
+    API --> Q[Worker queue / scheduler]
+    Q --> W[Data / backtest / analytics workers]
+    W --> DB
+    W --> OTEL[OpenTelemetry logs/metrics/traces]
+    OTEL --> G[Prometheus/Grafana or managed monitor]
+    API --> RBAC[Auth + RBAC + audit trail]
+```
+
+### واجهات API المقترحة
+
+| المجال | أمثلة read/write API | ضوابط لازمة |
+|---|---|---|
+| datasets | `POST /datasets/import`, `GET /datasets/{hash}`, `GET /quality-incidents` | manifest/hash/license، no raw secret |
+| analysis | `POST /analysis/runs`, `GET /decisions/{id}` | `as_of`, engine versions، evidence provenance |
+| risk | `GET /risk/state`, `POST /risk/limits/validate` | read-only state، role separation، never allow UI override to bypass limit |
+| research | `POST /experiments`, `GET /experiments/{id}/metrics` | immutable trial ledger، final-OOS lock |
+| paper | `POST /paper/orders`, `GET /paper/orders/{id}` | idempotency key، simulator only، kill switch |
+| monitoring | `GET /health`, `GET /incidents`, `GET /drift` | alert acknowledgement audit |
+| execution (future) | no endpoint until approval | separate service/account/credentials/human approval |
+
+### لوحة تحكم لازمة وليست منفذة بعد
+
+1. **Market/Data health:** feed heartbeat، freshness، gap/duplicate/schema incidents، source manifest.
+2. **Analysis:** regime، reports per engine، evidence selected/discarded as correlated، invalidation وسبب `NO_TRADE`.
+3. **Risk:** equity/high-water mark، DD episodes، daily/weekly limits، exposure/correlation، event/gap embargo، kill status.
+4. **Research:** experiment lineage، OOS/final-holdout state، PF/expectancy/Sharpe/Sortino وslices strategy/timeframe/session.
+5. **ML (بعد بنائه):** model/feature/label versions، baseline/OOS comparison، calibration/drift/missingness.
+6. **Paper:** idempotency state، synthetic fills، reconciliation status؛ ولا تظهر كأنها صفقات حقيقية.
+
+### التخزين والأمن
+
+- **الآن:** JSON knowledge + CSV manifest + JSONL hash ledger محلياً؛ لا أسرار أو raw licensed data في Git.
+- **عند الحاجة:** PostgreSQL كـsystem-of-record للmetadata/read models. يمكن أن يكون Supabase managed PostgreSQL خياراً مناسباً إذا نُفذت RLS، migrations، service-role isolation وaudit log؛ لم يُنشأ اتصال في هذا المشروع.
+- **Raw market data/artifacts:** object storage بversioning/retention/license tags؛ DB يخزن metadata وhash فقط.
+- **الواجهة:** Vercel قد يستضيف React dashboard إن اختير، لكنه لا يخزن مفاتيح مزود السوق ولا ينفذ أوامر. لا يوجد نشر Vercel حالياً.
+- **الأسرار:** secret manager/بيئة تشغيل فقط، least privilege، key rotation، لا logs للـtokens أو payloads الحساسة.
+
+## 11) ما يمكن بناؤه الآن وما يحتاج خارجياً
+
+| يمكن بناؤه/تشغيله الآن محلياً | يحتاج بيانات أو خدمة خارجية قبل تشغيله |
+|---|---|
+| knowledge retrieval، school-engine fixtures، central de-correlation | XAU/USD/GC historical أو live API مرخّص |
+| CSV validation/manifest/resampling، replay، analytics، risk-book fixtures | contract specs/lot, bid/ask/spread، calendar/holiday/roll policy |
+| Monte Carlo/walk-forward/ledger، paper simulator في الذاكرة | persistent paper feed، reconciliation، alerts delivery |
+| dashboard schema/API contracts وmock UI | Supabase/PostgreSQL/object storage/auth وdeployment اختيارية |
+| rule/statistical baselines specification | ML feature store، labels، data volume، compute/experiment registry |
+| execution interface design وkill-switch state machine | موافقة صريحة، broker account/API، security review، human approval workflow |
+
+المصادر والـAPI المطلوبة مفصلة في [`DATA_SOURCES_AR.md`](DATA_SOURCES_AR.md)، وحوكمة ML في [`AI_ML_GOVERNANCE_AR.md`](AI_ML_GOVERNANCE_AR.md). وجود تصميم أو interface لا يعني اتصالاً أو جاهزية للتنفيذ الحقيقي.

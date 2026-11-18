@@ -108,6 +108,8 @@ print(run.summary)
 
 ## تفسير النتائج
 
+إضافة إلى `BacktestSummary`، يوفر `PerformanceAnalyzer` attribution منفصلاً حسب `strategy_id` و`timeframe` وsession UTC، ويستخرج peak-to-trough-to-recovery drawdown episodes. الجلسات الافتراضية مجرد تقسيم UTC عام وليست calendar للبورصة أو سياسة DST. تمرر تقويم المنتج الحقيقي قبل إصدار تقرير رسمي.
+
 `BacktestSummary` يفرق بين:
 
 - `trade_*`: عدد الصفقات، صافي الربح، expectancy، profit factor وwin rate من الصفقات المغلقة.
