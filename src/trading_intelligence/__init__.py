@@ -17,4 +17,4 @@ __all__ = [
     "Candle", "ChartAnalysisAgent", "DecisionAction", "GeminiRole", "KnowledgeBase", "LiveIntegrationGate", "MarketResearchAgent",
     "MarketSnapshot", "OperationalMonitor", "PortfolioRiskBook", "RiskManagementEngine", "SignalCondition",
 ]
-__version__ = "0.10.0"
+__version__ = "0.11.0"

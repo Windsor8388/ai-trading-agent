@@ -17,7 +17,7 @@
 1. يلزم `ExecutionPolicy` صريحة تتضمن `InstrumentRiskSpec` لكل رمز مسموح، و`quantity step/minimum`، وحدود notional وworst-case cash risk عند ضبطها.
 2. لا يُرسل سوى lifecycle محلي؛ لا يوجد adapter أو مفاتيح اتصال.
 3. يعالج الانقطاع بـ`UNKNOWN`، ثم snapshot موثوق مع cumulative quantity قبل اعتبار أي fill معروفاً.
-4. يمكن ربط transitions بـ`ResearchLedger` JSONL hash-chain على تخزين دائم. هذه حماية من العبث المحلي وليست بديلاً عن WORM/object storage أو audit خارجي.
+4. يمكن ربط transitions بـ`ResearchLedger` JSONL hash-chain محلياً **أو** بـ`SupabaseLifecycleStore` server-side الذري؛ يمنع الكود ربط الاثنين معاً حتى لا يدّعي اتساقاً موزعاً غير موجود. مسار Supabase لا يصل إليه المتصفح ولا ينفذ أمراً؛ راجع [SUPABASE_PERSISTENCE_AR.md](SUPABASE_PERSISTENCE_AR.md).
 
 راجع [EXECUTION_SAFETY_AR.md](EXECUTION_SAFETY_AR.md) لقواعد الترقية الكاملة.
 
@@ -46,7 +46,7 @@ python -m json.tool dashboard/vercel.json
 
 ## مساحة التحكم المتكاملة
 
-إصدار الواجهة `V0.10` يضيف **Research Operations Desk** فوق أقسام المحركات:
+إصدار الواجهة `V0.11` يعرض **Research Operations Desk** فوق أقسام المحركات:
 
 - اختيار أداة وإطار للعرض (`XAU/USD` و`GC` منفصلان، مع EUR/USD وUS500 وAAPL وBTC/USD، وM1 إلى D1) مع Watchlist مخصصة للعرض فقط.
 - مزامنة اختيار العرض مع مساحة الرسم الخارجي، ولكن لا يبدأ تحميل طرف ثالث قبل الضغط الصريح على زر التحميل.
@@ -72,4 +72,4 @@ flowchart LR
   UI -. opt-in external visualization only .-> TV[Third-party chart]
 ```
 
-واجهة المستخدم تقرأ summary وsnapshots المعتمدة من API مستقبلاً عبر URLs نسبية ومصادقة/RBAC. لا يجوز وضع provider token أو DB key أو broker secret في JavaScript أو Vercel public environment. `Supabase` أو PostgreSQL يمكن استخدامهما لاحقاً للـmetadata/RLS/audit، لكن لا توجد قاعدة بيانات أو اتصال Supabase مهيأ حالياً.
+واجهة المستخدم تقرأ summary وsnapshots المعتمدة من API مستقبلاً عبر URLs نسبية ومصادقة/RBAC. لا يجوز وضع provider token أو DB key أو broker secret في JavaScript أو Vercel public environment. يوجد الآن schema/RLS/RPC في Supabase لسجل Paper audit server-side، لكن Vercel الحالي static ولا يملك backend أو environment binding؛ لذلك لا يوجد اتصال Supabase من الواجهة ولا مسار منشور يستخدمه حالياً. التفاصيل في [SUPABASE_PERSISTENCE_AR.md](SUPABASE_PERSISTENCE_AR.md).

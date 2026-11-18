@@ -139,7 +139,7 @@ flowchart TD
 | L1/L2/trades | feed تداول مرخّص للـvenue | sequence، quote/trade timestamps، depth، recovery | مطلوب لـdelta/CVD/footprint؛ OHLC غير بديل |
 | calendar/macros | calendar مرخّص أو إصدارات الجهات الرسمية مثل FRED/BLS/BEA حيث يناسب | scheduled/published UTC، actual/consensus/prior/revisions/vintage | حفظ source وrevision؛ event embargo عند العطل |
 | news/NLP | مزود أخبار مرخّص | publish/received UTC، source/license، duplicate/revision IDs | latency/rights/entity policy قبل أي feature |
-| persistence/metadata | PostgreSQL؛ Supabase خيار managed لاحق | migrations، RLS، audit metadata، no raw payload secrets | لا اتصال مُنشأ في هذا المستودع |
+| persistence/metadata | PostgreSQL؛ Supabase managed | migration `ati_` لسجل Paper lifecycle، RLS، service-role RPC، no raw payload secrets | schema مطبق، لكن لا backend binding أو browser access أو market persistence؛ راجع `SUPABASE_PERSISTENCE_AR.md` |
 | dashboard hosting | لوحة static منشورة على Vercel | CSP، relative URLs، no client secrets، وحد عرض خارجي opt-in | لا backend/API أو provider integration في الواجهة |
 
 مراجع OANDA وCME الموجودة في [`knowledge/sources.json`](../knowledge/sources.json) تثبت شكل product/API المعروض في وثائقها فقط. لا تثبت ملاءمة مصدر بعينه، تسعيره، ترخيصه، توفره في منطقة المستخدم، أو وجود بيانات حية.

@@ -13,7 +13,7 @@ from datetime import datetime
 from enum import Enum
 import hashlib
 import json
-from typing import Mapping
+from typing import Mapping, Protocol
 
 from ..models import DecisionAction, InstrumentRiskSpec, TradeSignal
 from ..research.ledger import ResearchLedger
@@ -144,15 +144,28 @@ class OrderRecord:
     events: tuple[ExecutionEvent, ...] = ()
 
 
+class OrderLifecycleStore(Protocol):
+    """Durably record one already-validated lifecycle transition.
+
+    Implementations must be idempotent for the same immutable order/event pair and
+    must raise when persistence is unavailable or uncertain. The manager then leaves
+    its local state unchanged rather than claiming a transition occurred.
+    """
+
+    def record_transition(self, order: OrderRecord, event: ExecutionEvent) -> None:
+        """Persist one transition before the manager exposes it locally."""
+
+
 class OrderLifecycleManager:
     """Local paper lifecycle manager with durable-audit integration when configured.
 
     `audit_ledger` is optional for isolated unit tests and disposable demonstrations.
-    A deployed paper workflow should pass a `ResearchLedger` path on durable storage;
-    a failed audit append prevents the corresponding local state transition.
+    Deployed paper workflows should supply either that local hash ledger or an atomic
+    `durable_store`; configuring both would create cross-store consistency ambiguity.
+    A persistence failure prevents the corresponding local state transition.
     """
 
-    version = "0.2.0"
+    version = "0.3.0"
 
     _in_flight = {
         OrderStatus.SUBMITTED,
@@ -167,10 +180,14 @@ class OrderLifecycleManager:
         *,
         policy: ExecutionPolicy | None = None,
         audit_ledger: ResearchLedger | None = None,
+        durable_store: OrderLifecycleStore | None = None,
     ) -> None:
+        if audit_ledger is not None and durable_store is not None:
+            raise ValueError("Use either the local audit ledger or one atomic durable lifecycle store, not both.")
         self.mode = mode
         self.policy = policy
         self.audit_ledger = audit_ledger
+        self.durable_store = durable_store
         self._orders: dict[str, OrderRecord] = {}
         self._halted = False
         self._connected = True
@@ -253,6 +270,8 @@ class OrderLifecycleManager:
 
     def _store(self, order: OrderRecord) -> OrderRecord:
         event = order.events[-1]
+        if self.durable_store is not None:
+            self.durable_store.record_transition(order, event)
         self._persist_event(order, event)
         self._orders[order.client_order_id] = order
         return order
@@ -274,6 +293,8 @@ class OrderLifecycleManager:
             if existing.request_fingerprint != fingerprint:
                 raise ValueError("client_order_id was already used for a different immutable order intent.")
             return existing
+        if self.durable_store is not None and any(existing.request_fingerprint == fingerprint for existing in self._orders.values()):
+            raise ValueError("The immutable order intent is already bound to a different client_order_id.")
         reason: str | None = None
         if self._halted:
             reason = "Emergency stop is active."

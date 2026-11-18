@@ -1,6 +1,6 @@
 # التصميم المعماري لنظام Trading Intelligence
 
-**الإصدار:** 0.10.0 · **الوضع التشغيلي الحالي:** `ANALYSIS_ONLY` محلي وبدون أي data feed للنظام متصل. يوجد CSV importer وhistorical replay وPaper simulator وrisk/performance analytics وexecution lifecycle محلية، لكنها لا تتصل بسوق أو وسيط. توجد لوحة static مع رسم TradingView خارجي اختياري ومعزول؛ العرض ليس data feed ولا input للمحركات.
+**الإصدار:** 0.11.0 · **الوضع التشغيلي الحالي:** `ANALYSIS_ONLY` محلي وبدون أي data feed للنظام متصل. يوجد CSV importer وhistorical replay وPaper simulator وrisk/performance analytics وexecution lifecycle محلية، لكنها لا تتصل بسوق أو وسيط. توجد لوحة static مع رسم TradingView خارجي اختياري ومعزول؛ العرض ليس data feed ولا input للمحركات. أضيف في V0.11 migration وadapter اختياريان لسجل Paper lifecycle ذري في Supabase، لكن لا يوجد backend منشور أو secret binding أو اتصال سوق مفعل؛ راجع [`SUPABASE_PERSISTENCE_AR.md`](SUPABASE_PERSISTENCE_AR.md).
 التصميم يفصل عمداً البحث والتحليل والورق والتنفيذ. لا يجوز اختصار هذه المسارات لمجرد أن جميعها تستخدم كلمة "signal".
 
 ## 1) المعمارية المستهدفة
@@ -338,7 +338,7 @@ PerformanceAnalyzer
 
 ## 10) API ولوحة التحكم والمراقبة — تصميم قبل البناء
 
-لا توجد خدمة API أو واجهة منشورة في هذا الفرع. هذا عقد البناء المقترح، وليس ادعاء اتصال بـSupabase أو Vercel.
+توجد لوحة static منشورة وWSGI control-plane GET-only يمكن تشغيله خلف same-origin proxy، لكن لا توجد خدمة تحليل أو API أو backend Supabase منشور في هذا الفرع. ما يلي عقد البناء المقترح، وليس ادعاء اتصال بيانات سوق أو broker أو secret binding. توجد migration Supabase منفذة لسجل Paper audit server-side الاختياري فقط؛ تفاصيلها في [`SUPABASE_PERSISTENCE_AR.md`](SUPABASE_PERSISTENCE_AR.md).
 
 ```mermaid
 flowchart LR
@@ -377,10 +377,10 @@ flowchart LR
 
 ### التخزين والأمن
 
-- **الآن:** JSON knowledge + CSV manifest + JSONL hash ledger محلياً؛ لا أسرار أو raw licensed data في Git.
-- **عند الحاجة:** PostgreSQL كـsystem-of-record للmetadata/read models. يمكن أن يكون Supabase managed PostgreSQL خياراً مناسباً إذا نُفذت RLS، migrations، service-role isolation وaudit log؛ لم يُنشأ اتصال في هذا المشروع.
+- **الآن:** JSON knowledge + CSV manifest + JSONL hash ledger محلياً. إضافةً إلى ذلك يوجد Supabase migration مطبق لسجل `ati_` الذري الخاص بـPaper lifecycle، لكنه لا يعمل ما لم يمرره backend موثوق صراحةً؛ لا أسرار أو raw licensed data في Git.
+- **عند الحاجة:** PostgreSQL كـsystem-of-record للmetadata/read models. مسار Supabase الحالي يطبق RLS وservice-role isolation وidempotent audit event RPC، لكنه ليس بديلاً عن auth/RBAC للتطبيق أو object retention أو reconciliation؛ راجع [`SUPABASE_PERSISTENCE_AR.md`](SUPABASE_PERSISTENCE_AR.md).
 - **Raw market data/artifacts:** object storage بversioning/retention/license tags؛ DB يخزن metadata وhash فقط.
-- **الواجهة:** Vercel قد يستضيف React dashboard إن اختير، لكنه لا يخزن مفاتيح مزود السوق ولا ينفذ أوامر. لا يوجد نشر Vercel حالياً.
+- **الواجهة:** Vercel يستضيف لوحة static الحالية، لكنه لا يخزن مفاتيح مزود السوق ولا ينفذ أوامر. لا يوجد backend serverless مهيأ حالياً أو environment binding لـSupabase.
 - **الأسرار:** secret manager/بيئة تشغيل فقط، least privilege، key rotation، لا logs للـtokens أو payloads الحساسة.
 
 ## 11) ما يمكن بناؤه الآن وما يحتاج خارجياً
@@ -389,8 +389,8 @@ flowchart LR
 |---|---|
 | knowledge retrieval، school-engine fixtures، central de-correlation | XAU/USD/GC historical أو live API مرخّص |
 | CSV validation/manifest/resampling، replay، analytics، risk-book fixtures | contract specs/lot, bid/ask/spread، calendar/holiday/roll policy |
-| Monte Carlo/walk-forward/ledger، paper simulator في الذاكرة | persistent paper feed، reconciliation، alerts delivery |
-| dashboard schema/API contracts وmock UI | Supabase/PostgreSQL/object storage/auth وdeployment اختيارية |
+| Monte Carlo/walk-forward/ledger، paper simulator في الذاكرة، وSupabase paper-order audit اختياري server-side | persistent paper feed، reconciliation مع venue، alerts delivery |
+| dashboard static/control-plane status contract | auth/RBAC، object storage، وbackend deployment مهيأان |
 | rule/statistical baselines specification | ML feature store، labels، data volume، compute/experiment registry |
 | execution interface design وkill-switch state machine | موافقة صريحة، broker account/API، security review، human approval workflow |
 

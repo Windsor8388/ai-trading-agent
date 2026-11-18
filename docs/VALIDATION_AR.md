@@ -8,7 +8,7 @@
 PYTHONPATH=src python -m unittest discover -s tests -v
 ```
 
-الحالات الحالية (67 اختباراً):
+الحالات الحالية (73 اختباراً محلياً):
 
 - رفض `future/unclosed` bar لمنع look-ahead.
 - رفض ICT evidence على بيانات غير صالحة.
@@ -33,7 +33,8 @@ PYTHONPATH=src python -m unittest discover -s tests -v
 - عقد `BarRequest` يرفض نطاقاً زمنياً غير متزايد قبل أي provider implementation.
 - Operational monitor يميز feed stale وdata-quality incident ويعيد إلى healthy بعد heartbeat/resolve.
 - execution lifecycle يحجب `ANALYSIS_ONLY`، ويطلب `ExecutionPolicy` صريحة للـPaper (allowlist/product spec/notional/worst-case risk/active-order/gross-notional limits)، ويمنع تكرار `client_order_id` أو إعادة استخدامه لـimmutable intent مختلف.
-- lifecycle يسجل hash-chained audit عند ربطه بـ`ResearchLedger`، ويحّول in-flight إلى `UNKNOWN` عند الانقطاع، ويرفض fill reconciliation بلا cumulative quantity موثق، ويحافظ على UNKNOWN أثناء emergency stop حتى المصالحة.
+- lifecycle يسجل hash-chained audit عند ربطه بـ`ResearchLedger`، أو يسجل transition ذرياً/idempotent في `SupabaseLifecycleStore` عند ربطه صراحةً؛ يرفض الجمع بين sinkين حتى لا يخفي failure موزعاً. fixture Supabase يثبت URL/secret-reference boundary وcontiguous RPC payload وduplicate retry ورفض local advance عند HTTP failure.
+- lifecycle يحوّل in-flight إلى `UNKNOWN` عند الانقطاع، ويرفض fill reconciliation بلا cumulative quantity موثق، ويحافظ على UNKNOWN أثناء emergency stop حتى المصالحة.
 - dashboard contract يثبت أن وضع `ANALYSIS_ONLY` و`NO TRADE` ظاهر، وأن الرسم الخارجي opt-in داخل iframe sandbox ولا يكتب مدخلاً للمحركات، وأن security headers صالحة.
 - OANDA v20 adapter يُختبر بـtransport fixture: يطلب HTTPS/read-only path، يحفظ hash/lineage، ولا يمرر token إلى source URL، ويرفض bar غير المكتمل من output.
 - `MarketDataPipeline` يحجر gaps وفق policy ولا يملأها، ويسجل receipt وفشل/quality؛ ويصنف exact replay ويحجر revision متضارب وfeed حي stale، ولا يبني snapshot إلا من bars مقبولة exact-deduplicated؛ و`PeriodicPollingCoordinator` لا يبدأ daemon ويعمل فقط عند `poll_due()` صريحة.

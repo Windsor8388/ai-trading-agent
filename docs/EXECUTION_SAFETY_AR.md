@@ -1,7 +1,7 @@
 # مراحل التشغيل والتنفيذ الآمن
 
 **الحالة الحالية:** المنصة لا تتصل بوسيط ولا تنفذ أمراً حقيقياً.
-الملف `execution/lifecycle.py` هو state machine محلي للتدقيق والـPaper فقط؛ ليس venue adapter ولا يمكنه فتح شبكة أو تفعيل live trading.
+الملف `execution/lifecycle.py` هو state machine للـPaper فقط؛ ليس venue adapter ولا يمكنه فتح شبكة أو تفعيل live trading. يمكن تمرير `SupabaseLifecycleStore` منفصل اختيارياً لتسجيل facts في backend موثوق، لكنه لا يقرأ سوقاً ولا يرسل أمراً ولا يغير هذه الحدود؛ راجع [SUPABASE_PERSISTENCE_AR.md](SUPABASE_PERSISTENCE_AR.md).
 
 ## مبدأ الترقية
 
@@ -21,7 +21,7 @@ flowchart LR
 |---|---|---|---|
 | 0 — Analysis only | محركات التحليل، reports، `NO_TRADE` | paper/live order lifecycle | tests للـrules، data contracts، evidence provenance |
 | 1 — Historical replay | next-open replay، تكاليف معلنة، DD/PF/expectancy | تغيير القواعد على final OOS | walk-forward، OOS، Monte Carlo، parameter sensitivity |
-| 2 — Paper simulation | state machine محلي، idempotency، ledger، kill switch | broker/account/API credentials | توقعات forward مسجلة قبل outcome ومراجعة drift |
+| 2 — Paper simulation | state machine، idempotency، ledger محلي أو Supabase audit server-side اختياري، kill switch | broker/account/API credentials | توقعات forward مسجلة قبل outcome ومراجعة drift |
 | 3 — Forward paper | مزود أسعار read-only موثوق + reconcile | live order routing | data freshness، incident response، fill/reject/reconnect drills |
 | 4 — Controlled live study | adapter محدود، حساب منفصل، بشر في الحلقة | auto-scale/auto-withdraw/martingale | موافقة صريحة جديدة، security review، venue certification |
 | 5 — Limited live | حدود notional/positions/risk ضيقة | promotion ذاتية أو إلغاء risk gate | فترة مراقبة مستقلة وقرار حوكمة |
@@ -70,9 +70,9 @@ stateDiagram-v2
 
 - `OrderLifecycleManager.prepare()` يمنع `ANALYSIS_ONLY` و`LIVE_DISABLED`. وضع `PAPER` يطلب `ExecutionPolicy` صريحة بدلاً من افتراض مواصفات المنتج من الرمز.
 - `ExecutionPolicy` يطبق allowlist لـinstrument specs، minimum/quantity step، اتجاه levels، وحدود notional وworst-case cash risk، ويمكنه فرض سقف active orders وgross open notional؛ ولا يستطيع قبول risk غير الموافق عليه.
-- يمنع التكرار بواسطة `client_order_id` + immutable intent fingerprint؛ ويرفض إعادة استخدام ID مع تغير direction/levels/quantity/risk. Retries المتطابقة لـsubmission/ack/fill/cancel لا تضيف transition أو fill ثانياً، ويرفض venue id متضارب.
+- يمنع التكرار بواسطة `client_order_id` + immutable intent fingerprint؛ ويرفض إعادة استخدام ID مع تغير direction/levels/quantity/risk. عند ربط durable store، يمنع أيضاً تغليف fingerprint مطابق في client ID ثانٍ لتطابق قيد قاعدة البيانات. Retries المتطابقة لـsubmission/ack/fill/cancel لا تضيف transition أو fill ثانياً، ويرفض venue id متضارب.
 - يرفض submission إن كانت صحة الاتصال غير مؤكدة.
-- يمكن ربط lifecycle بـ`ResearchLedger`: يسجل validation/submission/ack/fill/reject/cancel/disconnect/reconciliation في JSONL hash-chain؛ فشل append يمنع transition المحلي.
+- يمكن ربط lifecycle بـ`ResearchLedger` محلي أو `SupabaseLifecycleStore` server-side حصراً: الأول يسجل JSONL hash-chain، والثاني يمر عبر RPC ذري يفرض event sequence/idempotency/RLS. فشل أي sink مختار يمنع transition المحلي؛ لا يسمح الكود بربط الاثنين معاً أو باعتبار timeout نجاحاً.
 - يجعل الحالة `UNKNOWN` عند الانقطاع بدلاً من افتراض outcome. reconciliation لجزء/كل fill يتطلب `VenueOrderSnapshot` بتوقيت ومقدار cumulative quantity؛ snapshot الخالي من client id لا يثبت الإلغاء.
 - `emergency_stop()` يحجب intents الجديدة؛ يُبقي UNKNOWN غير محسوم ويسجل أن reconciliation مطلوب. لا يرسل أي نداء خارجي.
 

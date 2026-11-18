@@ -42,6 +42,16 @@ class ExecutionLifecycleTests(unittest.TestCase):
         self.assertEqual(oversized.status, OrderStatus.REJECTED)
         self.assertIn("notional", oversized.rejection_reason or "")
 
+    def test_durable_lifecycle_does_not_rebind_same_immutable_intent_to_another_client_id(self) -> None:
+        class FixtureStore:
+            def record_transition(self, order: object, event: object) -> None:
+                return None
+
+        manager = OrderLifecycleManager(ExecutionMode.PAPER, policy=POLICY, durable_store=FixtureStore())
+        manager.prepare(candidate_signal(), "order-fingerprint-1", NOW)
+        with self.assertRaises(ValueError):
+            manager.prepare(candidate_signal(), "order-fingerprint-2", NOW)
+
     def test_paper_lifecycle_is_idempotent_tracks_fills_and_persists_hash_audit(self) -> None:
         with TemporaryDirectory() as temporary_directory:
             ledger = ResearchLedger(Path(temporary_directory) / "execution.jsonl")
